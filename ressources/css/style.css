@@ -94,11 +94,32 @@ a {
 /*align verical top item inside*/
 
 
+/* Grille responsive */
+.sprite {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  align-items: start;
+  padding: 8px 0;
+}
+
+/* Images contrôlées */
 .sprite img {
-    transform: scale(1);
-    position: relative;
-    top: 0;
-    margin: 10px;
+  width: 100%;          
+  height: auto;        
+  max-height: 220px;    
+  object-fit: contain;  
+  image-rendering: pixelated;   
+  image-rendering: crisp-edges; 
+}
+
+/* Cadre discret */
+.border {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
   
 /*table part*/
