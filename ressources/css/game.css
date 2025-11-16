@@ -1,0 +1,88 @@
+body {
+  margin: 0;
+  height: 100vh;
+  background: url('../images/mockup/SuperRijodaMenu.png') center center / 100% 100% no-repeat;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  font-family: 'Press Start 2P', cursive;
+  overflow: hidden;
+}
+
+.button-container {
+  position: absolute;
+  top: 58%;
+  left: 8%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Buttons */
+.btn {
+  font-size: 14px;
+  color: #fff;
+  background: #b13c2f;
+  border: 3px solid #80301f;
+  border-radius: 8px;
+  padding: 12px 24px;
+  width: 220px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 4px 0 #80301f;
+  transition: all 0.1s ease-in-out;
+}
+
+.backBtn {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  font-size: 14px;
+  color: #fff;
+  background: #b13c2f;
+  border: 3px solid #80301f;
+  border-radius: 8px;
+  padding: 12px 24px;
+  width: 220px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 4px 0 #80301f;
+  transition: all 0.1s ease-in-out;
+}
+
+
+.btn:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #80301f;
+  background: #d94f3a;
+}
+
+.backBtn:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #80301f;
+  background: #d94f3a;
+}
+
+.btn.secondary {
+  background: #e0b57d;
+  color: #4c2c15;
+  border-color: #b78c5a;
+  box-shadow: 0 4px 0 #b78c5a;
+}
+
+.btn.secondary:hover {
+  background: #f4c892;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .button-container {
+    top: 65%;
+    left: 5%;
+    gap: 16px;
+  }
+  .btn {
+    width: 180px;
+    font-size: 12px;
+  }
+}
