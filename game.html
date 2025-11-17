@@ -1,12 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-  <title>Super Rijoda</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Super Rijoda – Level 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="ressources/css/game.css" />
 </head>
 <body>
+  <a href="loadingScreen.html" class="backBtn secondary" style="position:absolute;top:16px;left:16px;">Back</a>
 
-    <h1>The game will be here</h1>
+  <main class="stage">
+    <div id="game-wrapper">
+      <canvas id="game" width="960" height="540"></canvas>
 
+      <!-- HUD -->
+      <div class="hud">
+        <span id="score">Score: 0</span>
+        <span id="lives">❤️❤️❤️</span>
+      </div>
+
+      <!-- Pause overlay -->
+      <div id="pauseOverlay" class="overlay" hidden>
+        <div class="panel">
+          <h3>Paused</h3>
+          <button id="resumeBtn" class="primary">Resume</button>
+        </div>
+      </div>
+
+      <!-- Game Over -->
+      <div id="gameOver" class="overlay" hidden>
+        <div class="panel">
+          <h3>Game Over</h3>
+          <p id="finalScore">Score: 0</p>
+          <button id="retryBtn" class="primary">Retry</button>
+        </div>
+      </div>
+
+      <!-- Win -->
+      <div id="winScreen" class="overlay" hidden>
+        <div class="panel">
+          <h3>Level Complete!</h3>
+          <p id="winScore">Score: 0</p>
+          <button id="winMenuBtn" class="primary">Menu</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="ressources/js/game.js"></script>
 </body>
 </html>
