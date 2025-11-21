@@ -5,11 +5,16 @@
 // ------- Game State -------
 const Game = {
   running:true, paused:false,
-  score:0, lives:3,
+  score:0, lives:3, time:0,
+  particles: [],
   gravity:0.6, friction:0.85,
   worldW: 2000, worldH: 540, // Canvas Height
   camX:0,
-  resetHUD(){ UI.score.textContent=`Score: ${this.score}`; UI.lives.textContent='❤️'.repeat(this.lives); },
+  resetHUD(){ 
+    UI.score.textContent=this.score; 
+    UI.time.textContent = this.time.toFixed(2);
+    UI.lives.textContent='❤️'.repeat(this.lives); 
+  },
 
   // AUDIO
   bgmElement: new Audio(ASSETS.bgm),
@@ -28,6 +33,7 @@ const Game = {
 const UI = {
   score: document.getElementById('score'),
   lives: document.getElementById('lives'),
+  time:  document.getElementById('time'),
   pause: document.getElementById('pauseOverlay'),
   over:  document.getElementById('gameOver'),
   win:   document.getElementById('winScreen'),
@@ -38,10 +44,21 @@ const UI = {
 
 // ------- Lifecycle Functions -------
 function end(win){
-  Game.running=false;
+  Game.running = false;
   Game.stopBGM();
-  if(win){ UI.winScore.textContent=`Score: ${Game.score}`; UI.show(UI.win); }
-  else   { UI.finalScore.textContent=`Score: ${Game.score}`; UI.show(UI.over); }
+  
+  // On formate le temps final proprement
+  const finalTime = Game.time.toFixed(2);
+
+  if (win) {
+    // Affichage Victoire : Score Total + Temps Total
+    UI.winScore.textContent = `${Game.score} pts | ${finalTime}s`;
+    UI.show(UI.win);
+  } else {
+    // Affichage Défaite : Score accumulé jusqu'à la mort
+    UI.finalScore.textContent = `${Game.score} pts`;
+    UI.show(UI.over);
+  }
 }
 
 function togglePause(force){
