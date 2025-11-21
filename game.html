@@ -16,33 +16,48 @@
 
       <!-- HUD -->
       <div class="hud">
-        <span id="score">Score: 0</span>
-        <span id="lives">❤️❤️❤️</span>
+        <div class="hud-item">
+            <span class="hud-label">SCORE</span>
+            <span id="score">0</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">TIME</span>
+            <span id="time">0</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">LIVES</span>
+            <span id="lives">❤️❤️❤️</span>
+        </div>
       </div>
 
-      <!-- Pause overlay -->
       <div id="pauseOverlay" class="overlay" hidden>
-        <div class="panel">
-          <h3>Paused</h3>
-          <button id="resumeBtn" class="primary">Resume</button>
+        <div class="modal-box pause">
+          <h1>PAUSE</h1>
+          <button id="resumeBtn" class="btn primary">RESUME</button>
         </div>
       </div>
 
-      <!-- Game Over -->
       <div id="gameOver" class="overlay" hidden>
-        <div class="panel">
-          <h3>Game Over</h3>
-          <p id="finalScore">Score: 0</p>
-          <button id="retryBtn" class="primary">Retry</button>
+        <div class="modal-box lose">
+          <h1 class="title-lose">GAME OVER</h1>
+          <p>Le samouraï est tombé...</p>
+          <div class="score-box">
+              <span>FINAL SCORE</span>
+              <span id="finalScore" class="big-number">0</span>
+          </div>
+          <button id="retryBtn" class="btn danger">TRY AGAIN</button>
         </div>
       </div>
 
-      <!-- Win -->
       <div id="winScreen" class="overlay" hidden>
-        <div class="panel">
-          <h3>Level Complete!</h3>
-          <p id="winScore">Score: 0</p>
-          <button id="winMenuBtn" class="primary">Menu</button>
+        <div class="modal-box win">
+          <h1 class="title-win">VICTORY!</h1>
+          <p>La légende est née.</p>
+          <div class="score-box">
+              <span>TOTAL SCORE</span>
+              <span id="winScore" class="big-number">0</span>
+          </div>
+          <button id="winMenuBtn" class="btn success">MAIN MENU</button>
         </div>
       </div>
     </div>
@@ -50,10 +65,17 @@
 
   <script src="ressources/js/config.js"></script>   
   <script src="ressources/js/ui.js"></script>      
-  <script src="ressources/js/Entity.js"></script>  
+  
+  <script src="ressources/js/Entity.js"></script>
+  <script src="ressources/js/MovingPlatform.js"></script>  
+  <script src="ressources/js/Particle.js"></script>
+  <script src="ressources/js/Checkpoint.js"></script>
   <script src="ressources/js/Player.js"></script>  
   <script src="ressources/js/Enemy.js"></script>   
+  <script src="ressources/js/Spike.js"></script>   
+  <script src="ressources/js/Spring.js"></script>  
   <script src="ressources/js/Level.js"></script>   
+  
   <script src="ressources/js/game.js"></script>
 </body>
 </html>

@@ -64,3 +64,10 @@ addEventListener('keydown',e=>{
   if((e.code==='KeyP'||e.code==='Escape') && Game.running){togglePause();}
 });
 addEventListener('keyup',e=>keys.delete(e.code));
+
+
+function spawnExplosion(x, y, color, count = 10) {
+    for (let i = 0; i < count; i++) {
+        Game.particles.push(new Particle(x, y, color, 5));
+    }
+}
