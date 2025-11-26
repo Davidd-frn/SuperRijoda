@@ -42,10 +42,51 @@ const UI = {
   show(el){el.hidden=false}, hide(el){el.hidden=true}
 };
 
+// ------- Leaderboard storage -------
+const LEADERBOARD_KEY = 'leaderboard';
+const COUNTRY_KEY = 'playerCountryCode';
+
+function countryCodeToFlag(code){
+  if (!code || code.length !== 2) return '';
+  const offset = 127397;
+  return String.fromCodePoint(...code.toUpperCase().split('').map(c=>c.charCodeAt(0)+offset));
+}
+
+function saveLeaderboard(score){
+  try{
+    const name = (localStorage.getItem('playerName') || 'Anonymous').trim() || 'Anonymous';
+    const locRaw = localStorage.getItem('playerLocation');
+    const countryCode = (localStorage.getItem(COUNTRY_KEY) || '').trim().toUpperCase();
+    const flag = countryCodeToFlag(countryCode);
+    let location = null;
+    if (locRaw) {
+      try { location = JSON.parse(locRaw); } catch(e){ location = locRaw; }
+    }
+    let entries = [];
+    try{ entries = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || []; }catch(e){ entries = []; }
+    const existing = entries.find(e => e && e.name === name);
+    if (existing){
+      if ((existing.score ?? 0) < score){
+        existing.score = score;
+        existing.location = location ?? existing.location ?? null;
+        existing.countryCode = countryCode || existing.countryCode || '';
+        existing.flag = flag || existing.flag || '';
+      }
+    } else {
+      entries.push({ name, score, location, countryCode, flag });
+    }
+    entries.sort((a,b)=>(b.score||0)-(a.score||0));
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+  } catch (err){
+    console.warn('Could not save leaderboard', err);
+  }
+}
+
 // ------- Lifecycle Functions -------
 function end(win){
   Game.running = false;
   Game.stopBGM();
+  saveLeaderboard(Game.score);
   
   // On formate le temps final proprement
   const finalTime = Game.time.toFixed(2);
