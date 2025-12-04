@@ -134,15 +134,32 @@
     leaderboardList.innerHTML = entries
       .slice(0, 10)
       .map(
-        (e, idx) => `
-        <div class="leaderboard-row">
-          <div class="leaderboard-left">
-            <span>#${idx + 1}</span>
-            <img class="leaderboard-flag" src="${e.countryCode ? `https://flagcdn.com/24x18/${e.countryCode.toLowerCase()}.png` : ""}" alt="${e.countryCode || ""}" ${e.countryCode ? "" : "hidden"} />
-            <span class="leaderboard-name">${e.name || "Anonymous"}</span>
-          </div>
-          <span class="leaderboard-score">${e.score ?? 0} pts</span>
-        </div>`
+        (e, idx) => {
+        // Formatage du temps : s il existe, formater à 2 décimales. Sinon, afficher --
+          const timeDisplay = e.time ? `${e.time.toFixed(3)}s` : "--";
+          // Construction de l'URL du drapeau à partir du countryCode (plus fiable que l'emoji)
+          const flagUrl = e.countryCode 
+            ? `https://flagcdn.com/24x18/${e.countryCode.toLowerCase()}.png` 
+            : "";
+            
+          return `
+            <div class="leaderboard-row">
+              <div class="leaderboard-left">
+                <span class="leaderboard-rank">#${idx + 1}</span>
+                <img 
+                  class="leaderboard-flag" 
+                  src="${flagUrl}" 
+                  alt="${e.countryCode || ""}" 
+                  ${flagUrl ? "" : "hidden"} 
+                />
+                <span class="leaderboard-name">${e.name || "Anonymous"}</span>
+              </div>
+              <div class="leaderboard-right">
+                <span class="leaderboard-score">${e.score ?? 0} pts</span>
+                <span class="leaderboard-time">${timeDisplay}</span>
+              </div>
+            </div>`;
+        }
       )
       .join("");
   };

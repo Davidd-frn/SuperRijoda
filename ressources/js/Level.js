@@ -14,7 +14,8 @@ const Level1Data = {
     { x: 850, y: 400, w: 110, h: 140 }  // Fin
   ],
   coins:   [{x:360, y:410}, {x:760, y:260}],
-  enemies: [{x:600, y:280, type:'patrol', dist:80}],
+  enemies: [{x:600, y:280, type:'patrol', dist:80},
+            { x: 600, y: 100, type: 'bat', dist: 80 }],
   goal:    {x:900, y:350, w:40, h:40}
 };
 
@@ -53,7 +54,8 @@ const Level2Data = {
   ],
 
   coins:   [{x:380, y:110}, {x:800, y:410}],
-  enemies: [{x:350, y:80, type:'patrol', dist:100}],
+  enemies: [{x:350, y:80, type:'patrol', dist:100},
+            { x: 900, y: 180, type: 'bat', dist: 120 }],
   goal:    {x:970, y:200, w:40, h:40},
   
   // On supprime les ressorts (springs) car remplacés par la plateforme mobile
@@ -64,96 +66,82 @@ const Level2Data = {
 const Level3Data = {
   id: 3,
   background: '#FFFFFF',
-  
+
+
   // 1. LES PLATEFORMES (Structure)
   platforms: [
-    // --- ZONE 1 : LE DÉPART & LES PIQUES ---
-    { x: 0,   y: 400, w: 200, h: 140 }, // Zone de départ
+    // --- ZONE 1 : LE CHAMP DE PIQUES (Précision) ---
+    { x: 0,   y: 450, w: 150, h: 190 }, // Départ plus haut
     
-    // Petits piliers entre les piques (Sauts précis requis)
-    { x: 250, y: 380, w: 60, h: 160 }, 
-    { x: 400, y: 320, w: 60, h: 220 }, 
-    { x: 550, y: 380, w: 60, h: 160 }, 
+    // Piliers plus étroits que dans votre version précédente = plus dur
+    { x: 200, y: 350, w: 50, h: 190 }, 
+    { x: 350, y: 300, w: 50, h: 240 }, 
+    { x: 500, y: 350, w: 50, h: 190 }, 
 
-    // --- ZONE 2 : LE MUR VERTICAL ---
-    // Base du mur
-    { x: 700, y: 450, w: 150, h: 90 },
+    // --- ZONE 2 : LE MUR VERTICAL (Endurance) ---
+    { x: 650, y: 400, w: 150, h: 140 }, // Base du mur
     
-    // Escaliers flottants (OneWay) pour monter
-    { x: 850, y: 350, w: 80, h: 20, oneWay: true },
-    { x: 700, y: 250, w: 80, h: 20, oneWay: true }, // Retour vers la gauche pour monter
-    { x: 850, y: 150, w: 80, h: 20, oneWay: true }, // Retour droite
+    // Ascension en zigzag avec des oneWay
+    { x: 800, y: 300, w: 80, h: 20, oneWay: true },
+    { x: 650, y: 200, w: 80, h: 20, oneWay: true }, 
+    { x: 800, y: 100, w: 80, h: 20, oneWay: true },
 
-    // Le Sommet du Mur (Très haut)
-    { x: 1000, y: 150, w: 400, h: 40 }, // Longue plateforme haute avec ennemis
+    // Le Sommet (très haut)
+    { x: 950, y: 80, w: 300, h: 40 }, 
 
-    // --- ZONE 3 : LA DESCENTE INFERNALE ---
-    // Il faut redescendre sur des petites plateformes
-    { x: 1500, y: 250, w: 80, h: 20, oneWay: true },
-    { x: 1650, y: 350, w: 80, h: 20, oneWay: true },
-
-    // --- ZONE 4 : LE GOUFFRE FINAL (Moving Platforms only) ---
-    // Pas de sol ici, juste le vide mortel
-    { x: 2400, y: 300, w: 200, h: 40 }, // L'île de l'étoile (La fin)
+    // --- ZONE 3 : LE GOUFFRE FINAL (Timing) ---
+    // Juste une petite plateforme d'arrivée très loin
+    { x: 2200, y: 250, w: 150, h: 40 }, 
   ],
 
-  // 2. LES DANGERS (Piques)
+  // 2. LES DANGERS (Piques partout)
   spikes: [
-    // Au sol dans la Zone 1 (Entre les piliers)
-    // Si tu rates ton saut -> Piqué !
-    { x: 200, y: 510 }, { x: 310, y: 510 }, { x: 340, y: 510 },
-    { x: 460, y: 510 }, { x: 490, y: 510 }, { x: 610, y: 510 },
-    
-    // Piques sournoises sur le grand mur (Zone 2)
-    // Si tu rates la plateforme mobile, tu tombes dessus
-    { x: 750, y: 420 }, { x: 780, y: 420 }
+    // Zone 1 : Remplir les trous entre les piliers
+    { x: 150, y: 510 }, { x: 180, y: 510 },
+    { x: 250, y: 510 }, { x: 280, y: 510 }, { x: 310, y: 510 },
+    { x: 400, y: 510 }, { x: 430, y: 510 }, { x: 460, y: 510 },
+    { x: 550, y: 510 }, { x: 580, y: 510 }, { x: 610, y: 510 },
   ],
 
-  // 3. LES PLATEFORMES MOBILES (Le vrai challenge)
+  // 3. LES PLATEFORMES MOBILES (Rapides et dangereuses)
   movingPlatforms: [
-    // Ascenseur pour atteindre le sommet du mur (Zone 2)
-    // Monte et descend sur une grande distance
-    { x: 600, y: 400, w: 80, h: 20, rangeX: 0, rangeY: 180, speed: 1.5 },
-
-    // Les plateformes horizontales pour traverser le gouffre final (Zone 4)
-    // Elles font des aller-retours au dessus du vide
-    { x: 1800, y: 400, w: 80, h: 20, rangeX: 100, rangeY: 0, speed: 2 },
-    { x: 2100, y: 300, w: 80, h: 20, rangeX: 0, rangeY: 100, speed: 2.5 } // Celle-ci monte et descend vite !
+    // Pour traverser le gouffre final. Elles sont plus rapides maintenant (speed 2.5 et 3)
+    { x: 1300, y: 150, w: 80, h: 20, rangeX: 150, rangeY: 50, speed: 2.5 }, // Mouvement diagonal !
+    { x: 1650, y: 250, w: 80, h: 20, rangeX: 0, rangeY: 120, speed: 3.0 },  // Ascenseur rapide
+    { x: 1900, y: 200, w: 80, h: 20, rangeX: 150, rangeY: 0, speed: 2.5 }   // Dernier saut horizontal
   ],
 
-  // 4. LES ENNEMIS
+  // 4. LES ENNEMIS (Placés stratégiquement)
   enemies: [
-    // Un ennemi sur le premier pilier (dur à esquiver car peu de place)
-    { x: 410, y: 250, type: 'patrol', dist: 40 },
+    // Sur le pilier du milieu (très gênant pour sauter)
+    { x: 375, y: 150, type: 'patrol', dist: 20 },
     
-    // Deux ennemis sur le grand mur en haut (Zone 2)
-    { x: 1050, y: 110, type: 'patrol', dist: 100 },
-    { x: 1250, y: 110, type: 'patrol', dist: 100 }
+    // Pendant l'escalade du mur
+    { x: 810, y: 60, type: 'patrol', dist: 60 },
+
+    // Au sommet, pour vous accueillir après l'escalade
+    { x: 1000, y: 40, type: 'patrol', dist: 150 },
+
+    { x: 1450, y: 100, type: 'bat', dist: 120 }, 
+    
+    { x: 1800, y: 150, type: 'bat', dist: 80 }
   ],
 
-  // 5. LES PIÈCES (Pour guider le joueur)
   coins: [
-    {x: 280, y: 340}, {x: 580, y: 340}, // Zone 1
-    {x: 890, y: 110}, // Sommet escalier
-    {x: 1200, y: 110}, // Milieu mur
-    {x: 1840, y: 360}, // Sur la plateforme mobile 1
-    {x: 2140, y: 260}  // Sur la plateforme mobile 2
+    {x: 375, y: 220}, // Au dessus de l'ennemi du pilier (risque/récompense)
+    {x: 690, y: 160}, // Pendant l'escalade
+    {x: 1340, y: 110}, // Sur la 1ère plateforme mobile
+    {x: 1940, y: 160}  // Sur la dernière plateforme mobile
   ],
 
-  // 6. Checkpoint
   checkpoints: [
-    // CHECKPOINT 1 : Juste au pied du grand mur.
-    // Si on tombe pendant l'escalade, on reprend ici (pas besoin de refaire les piliers).
-    { x: 720, y: 390 }, 
-
-    // CHECKPOINT 2 : Tout en haut, avant de sauter dans le vide.
-    // C'est le "Saut de la Foi". Si on rate la plateforme mobile, on réapparaît juste en haut.
-    { x: 1350, y: 90 }
+    { x: 670, y: 350 }, // Avant le grand mur
+    { x: 1100, y: 30 }  // Au sommet, avant le gouffre final
   ],
 
-  // 7. L'OBJECTIF (Très loin)
-  goal: { x: 2500, y: 260, w: 40, h: 40 }
+  goal: { x: 2250, y: 200, w: 40, h: 40 }
 };
+
 
 
 // --- GESTIONNAIRE DE NIVEAU ---
@@ -167,7 +155,7 @@ const Level = {
   checkpoints: [],
 
   respawnX: 60,
-  respawnY: 300,
+  respawnY: 100,
   goal: null,
   currentId: 1,
   bgColor: '#e3a576',
@@ -177,7 +165,7 @@ const Level = {
     this.currentId = data.id;
 
     this.respawnX = 60;
-    this.respawnY = 300;
+    this.respawnY = 90;
 
     // Charge les plateformes classiques
     this.platforms = data.platforms; 
@@ -189,6 +177,10 @@ const Level = {
 
     this.coins = data.coins.map(c => new Coin(c.x, c.y));
     this.enemies = (data.enemies || []).map(e => {
+      if (e.type === 'bat') {
+           return new Bat(e.x, e.y, e.dist);
+       }
+
        const en = new Enemy(e.x, e.y);
        if(e.type === 'patrol') en.dist = e.dist; 
        return en;

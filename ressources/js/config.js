@@ -14,25 +14,50 @@ const CHARACTER_LIBRARY = {
     attack: "ressources/images/mockup/playerAttack.png",
     filter: "none",
     scale: 0.12,
+    footAdjust: 4,
   },
-  ronin: {
-    id: "ronin",
-    name: "Crimson Ronin",
-    run: "ressources/images/mockup/playerRun.png",
-    attack: "ressources/images/mockup/playerAttack.png",
-    filter: "hue-rotate(-18deg) saturate(1.15)",
-    scale: 0.12,
+  women: {
+    id: "women",
+    name: "Women Warrior",
+    run: "ressources/images/mockup/womenPlayer.png",
+    attack: "ressources/images/mockup/womenPlayer.png",
+    filter: "none",
+    scale: 0.18,
+    matchDefaultSize: true,
+    footAdjust: 5,
+    sheetRunSpec: {
+        cols: 4,
+        rows: 3,
+        fw: null, fh: null, // Laisse le jeu calculer la taille des frames
+        seq: {
+            idle: [0],               // Frame statique
+            run: [0, 1, 2, 3, 4, 5, 6, 7], // Les 2 premières lignes
+            jump: [2]                // Une frame de saut arbitraire
+        }
+    },
+
+    // Configuration pour l'attaque (utilise la ligne 3)
+    sheetAttackSpec: {
+        cols: 4,
+        rows: 3,
+        fw: null, fh: null,
+        seq: {
+            attack: [8, 9, 10, 11]   // La dernière ligne (indices 8,9,10,11)
+        }
+    },
   },
   shadow: {
     id: "shadow",
     name: "Shadow Shinobi",
-    run: "ressources/images/mockup/playerRun.png",
-    attack: "ressources/images/mockup/playerAttack.png",
-    filter: "hue-rotate(170deg) saturate(1.25)",
-    scale: 0.12,
+    run: "ressources/images/mockup/ninja-sheet.png",
+    attack: "ressources/images/mockup/ninja-sheet.png",
+    filter: "none",
+    scale: 0.18,
     matchDefaultSize: true, // force same on-screen size as default
+    footAdjust: -2,
     // Use the same grid as default but let frame size auto-calc so only one frame shows at a time
-    sheetRunSpec: { cols: 4, rows: 3, fw: null, fh: null },
+    sheetRunSpec: { cols: 4, rows: 3, fw: null, fh: null, seq: { idle: [8], run: [0, 1, 2, 3], jump: [6] } },
+    sheetAttackSpec: { cols: 4, rows: 3, fw: null, fh: null, seq: { attack: [4, 5, 6, 7] } },
   },
 };
 
@@ -58,6 +83,7 @@ const ASSETS = {
   playerAttack: PLAYER_SKIN.attack,
   playerRun: PLAYER_SKIN.run,
   enemy: "ressources/images/mockup/enemies.png",
+  bat: "ressources/images/mockup/bat-enemy.png",
   coins: "ressources/images/mockup/Coin-Mockup.png",
   // NOUVEAUX ASSETS AUDIO
   bgm: "ressources/audio/level_theme.mp3",
@@ -76,6 +102,7 @@ const SHEETS = {
     fw: 512, // Largeur basée sur 484 / 4
     fh: 682, // Hauteur basée sur 336 / 3
     seq: { idle: [0], run: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], jump: [6] },
+    footAdjust: 4,
   },
   playerAttack: {
     cols: 3,
@@ -90,6 +117,16 @@ const SHEETS = {
     rows: 3,
     scale: 0.5,
     seq: { walk: [0, 1, 2, 3] },
+  },
+  bat: {
+    cols: 4,
+    rows: 3,
+    scale: 0.15, 
+    seq: { 
+        fly: [0, 1, 2, 3],       
+        attack: [4, 5, 6, 7],    
+        sleep: [8, 9, 10, 11]    
+    },
   },
   coin: {
     cols: 4,

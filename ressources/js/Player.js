@@ -271,13 +271,15 @@ class Player extends Entity {
     const centerX = screenX + this.w / 2;
     const bottomY = this.y + this.h;
 
+    const footAdjust = PLAYER_SKIN.footAdjust ?? 4;
+
     ctx.save();
     ctx.translate(centerX, bottomY);
 
     if (this.facing === -1) ctx.scale(-1, 1);
     ctx.filter = this.tintFilter || "none";
 
-    this.sheet.draw(-drawW / 2, -drawH + 4, drawW, drawH);
+    this.sheet.draw(-drawW / 2, -drawH + footAdjust, drawW, drawH);
     ctx.restore();
   }
 }
