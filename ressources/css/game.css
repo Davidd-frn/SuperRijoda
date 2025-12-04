@@ -148,7 +148,7 @@ body {
 
 /* OVERLAYS & MODALES */
 .overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7); /* Fond plus sombre */
   backdrop-filter: blur(4px); /* Effet de flou moderne */
@@ -156,6 +156,9 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 100;
+  padding: 32px 12px;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .overlay[hidden] {
@@ -175,6 +178,8 @@ body {
   flex-direction: column;
   gap: 20px;
   position: relative;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Styles Spécifiques : Victoire vs Défaite */
@@ -196,6 +201,8 @@ body {
 .modal-box.select {
   width: 760px;
   max-width: 92vw;
+  max-height: calc(100vh - 96px);
+  overflow: auto;
 }
 
 .modal-box.select h1 {
