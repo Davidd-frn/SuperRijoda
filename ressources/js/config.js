@@ -54,7 +54,7 @@ const CHARACTER_LIBRARY = {
     filter: "none",
     scale: 0.18,
     matchDefaultSize: true, // force same on-screen size as default
-    footAdjust: -2,
+    footAdjust: 14, // push sprite further down so feet touch ground
     // Use the same grid as default but let frame size auto-calc so only one frame shows at a time
     sheetRunSpec: { cols: 4, rows: 3, fw: null, fh: null, seq: { idle: [8], run: [0, 1, 2, 3], jump: [6] } },
     sheetAttackSpec: { cols: 4, rows: 3, fw: null, fh: null, seq: { attack: [4, 5, 6, 7] } },

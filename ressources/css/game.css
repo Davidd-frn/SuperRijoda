@@ -645,9 +645,9 @@ body {
   border: 2px solid #000;
   border-radius: 10px;
   background: #f7f1e3 center center no-repeat;
-  background-size: cover;
+  background-size: contain;
+  background-position: center center;
   image-rendering: pixelated;
-  background-position: 0% 0%;
 }
 
 .leaderboard-list {
