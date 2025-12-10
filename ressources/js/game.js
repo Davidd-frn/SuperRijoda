@@ -99,9 +99,12 @@ function updateCamera() {
 
 // ------- Loop & lifecycle -------
 let last = 0;
+window.__stopGameLoop = false;
 
 function loop(t) {
-  if (!Game.running || Game.paused) {
+  if (window.__stopGameLoop) return;
+  if (!Game.running) return;
+  if (Game.paused) {
     requestAnimationFrame(loop);
     return;
   }

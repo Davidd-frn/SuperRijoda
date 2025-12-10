@@ -211,7 +211,7 @@
       localStorage.setItem(USERNAME_KEY, trimmedName);
     } catch (e) {}
     localStorage.setItem(STORAGE_KEY, selected);
-    window.location.href = "game.html";
+    window.location.href = "/play";
   });
 
   nameInput?.addEventListener("input", updateConfirmState);

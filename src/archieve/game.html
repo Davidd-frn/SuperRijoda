@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Super Rijoda – Level 1</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="src/css/game.css" />
+  </head>
+  <body>
+    <a
+      href="loadingScreen.html"
+      class="backBtn secondary"
+      style="position: absolute; top: 16px; left: 16px"
+      >Back</a
+    >
+
+    <main class="stage">
+      <div id="game-wrapper">
+        <canvas id="game" width="960" height="540"></canvas>
+
+        <!-- HUD -->
+        <div class="hud">
+          <div class="hud-item">
+            <span class="hud-label">SCORE</span>
+            <span id="score">0</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">TIME</span>
+            <span id="time">0</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">LIVES</span>
+            <span id="lives">❤️❤️❤️</span>
+          </div>
+        </div>
+
+        <div id="pauseOverlay" class="overlay" hidden>
+          <div class="modal-box pause">
+            <h1>PAUSE</h1>
+            <button id="resumeBtn" class="btn primary">RESUME</button>
+          </div>
+        </div>
+
+        <div id="gameOver" class="overlay" hidden>
+          <div class="modal-box lose">
+            <h1 class="title-lose">GAME OVER</h1>
+            <p>The samurai has died...</p>
+            <div class="score-box">
+              <span>FINAL SCORE</span>
+              <span id="finalScore" class="big-number">0</span>
+            </div>
+            <button id="retryBtn" class="btn danger">TRY AGAIN</button>
+          </div>
+        </div>
+
+        <div id="winScreen" class="overlay" hidden>
+          <div class="modal-box win">
+            <h1 class="title-win">VICTORY!</h1>
+            <p>A legend was born!</p>
+            <div class="score-box">
+              <span>TOTAL SCORE</span>
+              <span id="winScore" class="big-number">0</span>
+            </div>
+            <button id="winMenuBtn" class="btn success">MAIN MENU</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="ressources/js/config.js"></script>
+    <script src="ressources/js/ui.js"></script>
+
+    <script src="ressources/js/Entity.js"></script>
+    <script src="ressources/js/MovingPlatform.js"></script>
+    <script src="ressources/js/Particle.js"></script>
+    <script src="ressources/js/Checkpoint.js"></script>
+    <script src="ressources/js/Player.js"></script>
+    <script src="ressources/js/Enemy.js"></script>
+    <script src="ressources/js/Bat.js"></script>
+    <script src="ressources/js/Spike.js"></script>
+    <script src="ressources/js/Spring.js"></script>
+    <script src="ressources/js/Level.js"></script>
+
+    <script src="ressources/js/game.js"></script>
+  </body>
+</html>

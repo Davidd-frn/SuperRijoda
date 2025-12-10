@@ -19,6 +19,7 @@ const Game = {
   // AUDIO
   bgmElement: new Audio(ASSETS.bgm),
   startBGM(){
+    window.__bgmElement = this.bgmElement;
     this.bgmElement.loop = true;
     this.bgmElement.volume = 0.3;
     this.bgmElement.play().catch(e => console.log('BGM Autoplay blocked:', e));
@@ -26,8 +27,13 @@ const Game = {
   stopBGM(){
     this.bgmElement.pause();
     this.bgmElement.currentTime = 0;
+    if (window.__bgmElement) {
+      window.__bgmElement.pause();
+      window.__bgmElement.currentTime = 0;
+    }
   }
 };
+window.__bgmElement = Game.bgmElement;
 
 // ------- UI Elements -------
 const UI = {
@@ -129,5 +135,5 @@ function togglePause(force){
 
 // UI hooks
 document.getElementById('resumeBtn').onclick=()=>togglePause(false);
-document.getElementById('retryBtn').onclick=()=>{ location.reload(); };
-document.getElementById('winMenuBtn').onclick=()=>{ location.href='loadingScreen.html'; };
+document.getElementById('retryBtn').onclick=()=>{ location.href='/play'; };
+document.getElementById('winMenuBtn').onclick=()=>{ location.href='/game'; };

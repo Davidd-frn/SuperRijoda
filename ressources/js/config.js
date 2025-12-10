@@ -10,8 +10,8 @@ const CHARACTER_LIBRARY = {
   samurai: {
     id: "samurai",
     name: "Samurai",
-    run: "ressources/images/mockup/playerRun.png",
-    attack: "ressources/images/mockup/playerAttack.png",
+    run: "/ressources/images/mockup/playerRun.png",
+    attack: "/ressources/images/mockup/playerAttack.png",
     filter: "none",
     scale: 0.12,
     footAdjust: 4,
@@ -19,8 +19,8 @@ const CHARACTER_LIBRARY = {
   women: {
     id: "women",
     name: "Women Warrior",
-    run: "ressources/images/mockup/womenPlayer.png",
-    attack: "ressources/images/mockup/womenPlayer.png",
+    run: "/ressources/images/mockup/womenPlayer.png",
+    attack: "/ressources/images/mockup/womenPlayer.png",
     filter: "none",
     scale: 0.18,
     matchDefaultSize: true,
@@ -49,8 +49,8 @@ const CHARACTER_LIBRARY = {
   shadow: {
     id: "shadow",
     name: "Shadow Shinobi",
-    run: "ressources/images/mockup/ninja-sheet.png",
-    attack: "ressources/images/mockup/ninja-sheet.png",
+    run: "/ressources/images/mockup/ninja-sheet.png",
+    attack: "/ressources/images/mockup/ninja-sheet.png",
     filter: "none",
     scale: 0.18,
     matchDefaultSize: true, // force same on-screen size as default
@@ -82,15 +82,15 @@ const PLAYER_SKIN =
 const ASSETS = {
   playerAttack: PLAYER_SKIN.attack,
   playerRun: PLAYER_SKIN.run,
-  enemy: "ressources/images/mockup/enemies.png",
-  bat: "ressources/images/mockup/bat-enemy.png",
-  coins: "ressources/images/mockup/Coin-Mockup.png",
+  enemy: "/ressources/images/mockup/enemies.png",
+  bat: "/ressources/images/mockup/bat-enemy.png",
+  coins: "/ressources/images/mockup/Coin-Mockup.png",
   // NOUVEAUX ASSETS AUDIO
-  bgm: "ressources/audio/level_theme.mp3",
-  sfx_jump: "ressources/audio/jump.wav",
-  sfx_coin: "ressources/audio/coin.wav",
-  sfx_hit: "ressources/audio/hit.wav",
-  sfx_damage: "ressources/audio/damage.wav",
+  bgm: "/ressources/audio/level_theme.mp3",
+  sfx_jump: "/ressources/audio/jump.wav",
+  sfx_coin: "/ressources/audio/coin.wav",
+  sfx_hit: "/ressources/audio/hit.wav",
+  sfx_damage: "/ressources/audio/damage.wav",
 };
 
 // ------- Sprite sheets (ajuste si tes frames diffèrent) -------
