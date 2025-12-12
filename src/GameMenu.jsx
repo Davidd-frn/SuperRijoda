@@ -117,14 +117,14 @@ function GameMenu() {
               className="character-card"
               data-character="samurai"
               draggable="true"
-              data-preview="/ressources/images/mockup/Samurai.png"
+              data-preview="/ressources/images/mockup/RoninPicture.png"
               data-filter="none"
               data-cols="4"
               data-rows="3"
             >
               <div className="character-art">
                 <img
-                  src="/ressources/images/mockup/Samurai.png"
+                  src="/ressources/images/mockup/RoninPicture.png"
                   alt="Samurai preview"
                 />
                 <span className="swatch neutral"></span>

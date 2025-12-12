@@ -2,6 +2,27 @@
    SUPER RIJODA - GAME ENGINE (CORE)
    =========================== */
 
+
+// CONFIGURATION DES FONDS D'ÉCRAN
+const bgImages = []; 
+// Liste de vos fichiers images. Ajoutez-en autant que vous avez de niveaux.
+const bgFiles = [
+    'ressources/images/background/BG-Lvl1.png', // Image pour le Niveau 1
+    'ressources/images/background/BG-Lvl2.png', // Image pour le Niveau 2
+    'ressources/images/background/BG-Lvl3.png'  // Image pour le Niveau 3
+];
+
+// Chargement automatique des images
+bgFiles.forEach(file => {
+    const img = new Image();
+    img.src = file;
+    bgImages.push(img);
+});
+
+// Variable pour suivre le niveau actuel (0 = premier niveau)
+let currentLevelIndex = 0;
+
+
 // ------- Player + camera -------
 // On place le joueur temporairement, Level.init le replacera correctement
 const player = new Player(60, 380);
@@ -9,87 +30,32 @@ const player = new Player(60, 380);
 
 // --- FONCTION DÉCOR PARALLAXE ---
 function drawParallaxBackground() {
-    // 1. LE CIEL (Coucher de soleil impérial)
-    let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, "#4b1d1d");   // Rouge sombre/Bordeaux en haut
-    grad.addColorStop(0.4, "#b84328"); // Rouge brique
-    grad.addColorStop(1, "#f4e4bc");   // Beige "Papier de riz" en bas
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const imgIndex = currentLevelIndex % bgImages.length;
+    const bgToDraw = bgImages[imgIndex];
 
-    // 2. LE SOLEIL ROUGE (Symbole classique)
-    // Il descend légèrement avec la caméra pour l'effet de profondeur
-    const sunX = 600 - (Game.camX * 0.02); 
-    ctx.fillStyle = "rgba(200, 50, 50, 0.8)"; // Rouge sang un peu transparent
-    ctx.beginPath();
-    ctx.arc(sunX, 150, 60, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 3. LES MONTAGNES LOINTAINES (Brumeuses)
-    ctx.fillStyle = "rgba(80, 40, 40, 0.3)"; // Couleur rouille très transparente
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height);
-    for (let i = 0; i <= canvas.width; i += 10) {
-        // Formule mathématique pour des montagnes douces
-        const h = 150 + Math.sin(i * 0.01 + Game.camX * 0.01) * 50 + Math.cos(i * 0.03) * 20;
-        ctx.lineTo(i, canvas.height - h);
+    // 2. Sécurité : Si l'image n'est pas chargée, fond noir
+    if (!bgToDraw || !bgToDraw.complete) {
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        return;
     }
-    ctx.lineTo(canvas.width, canvas.height);
-    ctx.lineTo(0, canvas.height);
-    ctx.fill();
 
-    // 4. LE DÉCOR "SILHOUETTE" (Pagodes et Montagnes proches)
-    // C'est la couche la plus importante (noire/sombre)
-    ctx.fillStyle = "#2c1e1e"; // Marron très foncé presque noir
+    // 3. Calcul de la position pour le défilement infini
+    const parallaxSpeed = 0.5; // Vitesse de défilement (0.5 = 50% de la vitesse joueur)
     
-    // On dessine des formes basées sur la position de la caméra
-    // On boucle sur la largeur visible + une marge
-    const startX = Math.floor(Game.camX / 100) * 100;
-    const endX = startX + canvas.width + 200;
+    // On calcule le décalage X basé sur la caméra
+    const xPos = -(Game.camX * parallaxSpeed) % bgToDraw.width;
 
-    for (let x = startX; x < endX; x += 100) {
-        // On utilise une fonction "pseudo-aléatoire" basée sur X
-        // Cela permet que le décor soit toujours le même au même endroit
-        const randomHeight = Math.abs(Math.sin(x * 999)); 
-        
-        // Position écran
-        const screenX = x - (Game.camX * 0.5); // Parallaxe 0.5
+    // 4. Dessin de l'image (Première copie)
+    // On étire la hauteur (canvas.height) pour bien remplir l'écran
+    ctx.drawImage(bgToDraw, xPos, 0, bgToDraw.width, canvas.height);
 
-        // Une fois sur 5 (environ), on dessine une PAGODE au lieu d'une montagne
-        if (randomHeight > 0.85) {
-            drawPagoda(ctx, screenX, canvas.height - 50);
-        } else {
-            // Sinon, une petite colline pointue (style Karst chinois)
-            const hillH = 50 + randomHeight * 100;
-            ctx.beginPath();
-            ctx.moveTo(screenX - 60, canvas.height);
-            ctx.quadraticCurveTo(screenX, canvas.height - hillH, screenX + 60, canvas.height);
-            ctx.fill();
-        }
+    // 5. Dessin de l'image (Deuxième copie pour combler le vide à droite)
+    if (xPos + bgToDraw.width < canvas.width) {
+        ctx.drawImage(bgToDraw, xPos + bgToDraw.width, 0, bgToDraw.width, canvas.height);
     }
 }
 
-
-function drawPagoda(ctx, x, baseY) {
-    const w = 40;
-    const roofH = 15;
-    const floorH = 20;
-    
-    // On dessine 3 étages
-    for(let i=0; i<3; i++) {
-        const currentY = baseY - (i * floorH);
-        
-        // Le mur
-        ctx.fillRect(x - w/2 + (i*5), currentY - floorH, w - (i*10), floorH);
-        
-        // Le toit courbé
-        ctx.beginPath();
-        ctx.moveTo(x - w + (i*5), currentY - floorH); // Gauche toit
-        ctx.lineTo(x + w - (i*5), currentY - floorH); // Droite toit
-        ctx.lineTo(x, currentY - floorH - roofH);     // Pointe toit
-        ctx.fill();
-    }
-}
 
 
 function updateCamera() {
@@ -142,8 +108,8 @@ function loop(t) {
 
   // 4. Vérifier la Victoire (Toucher l'étoile)
   if (Level.goal && AABB(player.rect(), Level.goal)) {
-      console.log("Niveau terminé !");
       Level.next(); // Charge le niveau suivant
+      currentLevelIndex++;
       
       // On replace le joueur au début pour le prochain niveau
       player.x = 60; 

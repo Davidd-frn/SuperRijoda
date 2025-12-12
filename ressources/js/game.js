@@ -135,7 +135,11 @@ function loop(t) {
 
   // 2. Mettre à jour tout le niveau (Ennemis, Pièces, Piques, Ressorts)
   // C'est ici que Level.js fait tout le travail !
-  Level.update(dt);
+  if (isTrainingMode) {
+    trainingLevel.update(dt);
+  } else {
+    Level.update(dt);
+  }
 
   // 3. Mettre à jour la caméra
   updateCamera();

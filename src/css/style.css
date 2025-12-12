@@ -1,10 +1,20 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:200,400,400i,700|Roboto+Slab:700");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap");
+
+:root {
+  --ancient-red: #c41e3a;
+  --ancient-gold: #f2c14e;
+  --ancient-dark: #2d1810;
+  --ancient-light: #f5e6d3;
+}
 
 /* General styles */
 
 body {
-  background-color: white;
-  color: black;
+  background-color: #f5e6d3;
+  background-image: linear-gradient(45deg, #f5e6d3 25%, #f0dcc9 25%, #f0dcc9 50%, #f5e6d3 50%, #f5e6d3 75%, #f0dcc9 75%, #f0dcc9);
+  background-size: 40px 40px;
+  color: #2d1810;
   margin: 0;
   padding: 0;
 }
@@ -24,9 +34,12 @@ body,
 }
 
 h1 {
-  font-family: Montserrat;
+  font-family: "Noto Serif SC", Montserrat, serif;
   font-size: 3em;
   margin-top: 0;
+  color: var(--ancient-red);
+  text-shadow: 3px 3px 0 var(--ancient-gold), 6px 6px 0 rgba(0,0,0,0.2);
+  letter-spacing: 2px;
 }
 
 @media screen and (max-width: 768px) {
@@ -43,6 +56,8 @@ h1 {
 
 h3 {
   font-size: 1.5em;
+  color: var(--ancient-red);
+  font-family: "Noto Serif SC", serif;
 }
 
 p {
@@ -50,12 +65,22 @@ p {
 }
 
 a {
-  color: #5eccf1;
+  color: var(--ancient-red);
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: var(--ancient-gold);
 }
 /*border class*/
 .border {
-  border: 1px solid #ddd;
-  border-radius: 2px;
+  background: #f5e6d3;
+  border: 3px solid var(--ancient-red);
+  border-radius: 0;
+  padding: 16px;
+  box-shadow: 4px 4px 0 rgba(45, 24, 16, 0.2), 8px 8px 0 rgba(242, 193, 78, 0.3);
 }
 
 .menuAndDiagramm {
@@ -123,11 +148,11 @@ a {
 
 /* Cadre discret */
 .border {
-  background: #fff;
-  border: 1px solid #e6e6e6;
-  border-radius: 8px;
-  padding: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  background: #f5e6d3;
+  border: 3px solid var(--ancient-red);
+  border-radius: 0;
+  padding: 16px;
+  box-shadow: 4px 4px 0 rgba(45, 24, 16, 0.2), 8px 8px 0 rgba(242, 193, 78, 0.3);
 }
 
 /*table part*/
@@ -135,12 +160,20 @@ table {
   border-collapse: collapse;
   width: 100%;
   text-align: left;
+  border: 2px solid var(--ancient-red);
+  background-color: #f5e6d3;
 }
 th,
 td {
-  padding: 8px;
+  padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--ancient-gold);
+  color: var(--ancient-dark);
+}
+th {
+  background-color: var(--ancient-red);
+  color: var(--ancient-gold);
+  font-weight: bold;
 }
 /*la premire colonne doit etre plus petite meme chose pour la dernire colonne*/
 th:first-child {
@@ -151,10 +184,11 @@ th:last-child {
 }
 
 tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #f0dcc9;
 }
 tbody tr:hover {
-  background-color: #ddd;
+  background-color: #e8cfb8;
+  border-left: 3px solid var(--ancient-red);
 }
 @media screen and (max-width: 768px) {
   .screenshots {
@@ -183,20 +217,22 @@ tbody tr:hover {
 nav {
   width: 100%;
   margin: 0;
-  background-color: #bdbdbd;
-  color: #000;
+  background-color: var(--ancient-dark);
+  color: var(--ancient-gold);
+  border-bottom: 4px solid var(--ancient-red);
 }
 
 nav a {
   text-decoration: none;
-  color: #000;
-  padding: 10px;
+  color: var(--ancient-gold);
+  padding: 12px 16px;
   font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 nav a:hover {
-  background-color: #ccc;
-  color: #222;
+  background-color: var(--ancient-red);
+  color: var(--ancient-light);
 }
 
 nav ul {
@@ -234,27 +270,31 @@ header:not(section header) {
   position: relative;
   width: 100%;
   margin: 0;
-  background-image: url("https://dev-super-rijoda.pantheonsite.io/wp-content/uploads/2025/12/beau-tir-lac-cristallin-cote-base-montagne-enneigee-au-cours-journee-ensoleillee-scaled.jpg");
-  color: #fff;
+  background-image: url("https://dev-super-rijoda.pantheonsite.io/wp-content/uploads/2025/12/secondBG.png");
+  background-color: var(--ancient-dark);
+  color: var(--ancient-gold);
   padding-top: 120px;
   background-size: cover;
   background-position: center center;
+  border-bottom: 4px solid var(--ancient-red);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3);
 }
 
 header h1 {
   padding-left: 20px;
-  text-shadow: 4px 4px 4px rgba(255, 255, 255, 0.5);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5), 4px 4px 0 var(--ancient-gold);
+  color: var(--ancient-gold);
 }
 
 header li.active a {
-  color: #00a5e3;
-  background-color: #fff;
+  color: var(--ancient-gold);
+  border-bottom: 3px solid var(--ancient-red);
 }
 
 /* Support active states added by react-router NavLink */
 nav a.active {
-  color: #00a5e3;
-  background-color: #fff;
+  color: var(--ancient-gold);
+  background-color: var(--ancient-red);
 }
 
 .authors-tag {
@@ -304,16 +344,17 @@ section article header {
 }
 
 #articles header h2 {
-  color: #000;
+  color: var(--ancient-red);
   font-weight: 800;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 2px solid var(--ancient-gold);
   margin: 5px;
+  font-family: "Noto Serif SC", serif;
 }
 
 #articles header p {
   font-style: italic;
   text-align: right;
-  color: #ccc;
+  color: var(--ancient-dark);
   padding: 0;
   margin: 0;
   display: block;
@@ -322,7 +363,7 @@ section article header {
 .authors-inline {
   font-style: italic;
   text-align: right;
-  color: #ccc;
+  color: var(--ancient-dark);
 }
 
 .wp-content {
@@ -393,18 +434,18 @@ aside {
   float: right;
   width: 20%;
   margin: 0;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  border: 3px solid var(--ancient-red);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 rgba(45, 24, 16, 0.2), 8px 8px 0 rgba(242, 193, 78, 0.3);
+  background-color: #f5e6d3;
 }
 
 aside h3 {
   margin: 0 0 0px 0;
   font-size: 1.2em;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  background-color: #00a5e3;
-  color: #fff;
+  border-bottom: 2px solid var(--ancient-gold);
+  background-color: var(--ancient-red);
+  color: var(--ancient-gold);
   padding: 20px;
 }
 
@@ -467,8 +508,9 @@ figure {
 
 figcaption {
   text-align: center;
-  color: #666;
+  color: var(--ancient-dark);
   font-size: 0.9em;
+  font-style: italic;
 }
 
 .aligncenter {
@@ -491,12 +533,14 @@ figcaption {
 
 footer {
   flex-shrink: 0;
-  background-color: #bdbdbd;
-  color: #fff;
+  background-color: var(--ancient-dark);
+  color: var(--ancient-gold);
   padding: 20px;
   bottom: 0;
   clear: both;
   text-align: right;
+  border-top: 4px solid var(--ancient-red);
+  box-shadow: 0 -4px 0 rgba(0,0,0,0.2);
 }
 @media screen and (max-width: 768px) {
   footer img {

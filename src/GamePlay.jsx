@@ -7,6 +7,7 @@ const GAME_SCRIPTS = [
   "/ressources/js/config.js",
   "/ressources/js/ui.js",
   "/ressources/js/Entity.js",
+  "/ressources/js/Shuriken.js",
   "/ressources/js/MovingPlatform.js",
   "/ressources/js/Particle.js",
   "/ressources/js/Checkpoint.js",
@@ -87,7 +88,7 @@ function GamePlay() {
             </div>
             <div className="hud-item">
               <span className="hud-label">LIVES</span>
-              <span id="lives">⚘⚘⚘</span>
+              <span id="lives" style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", sans-serif' }}>❤❤❤</span>
             </div>
           </div>
 

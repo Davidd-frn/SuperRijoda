@@ -55,6 +55,12 @@ function Commands() {
               <p className="key-desc">Swing your katana to defeat enemies.</p>
             </div>
 
+            <div className="key-card" data-key="KeyF">
+              <div className="key-label">F</div>
+              <div className="key-name">Throw</div>
+              <p className="key-desc">Throw your shuriken to defeat enemies.</p>
+            </div>
+
             <div className="key-card" data-key="KeyP">
               <div className="key-label">P</div>
               <div className="key-name">Pause</div>

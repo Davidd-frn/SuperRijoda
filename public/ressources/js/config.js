@@ -9,12 +9,33 @@ const ctx = canvas.getContext("2d");
 const CHARACTER_LIBRARY = {
   samurai: {
     id: "samurai",
-    name: "Samurai",
-    run: "/ressources/images/mockup/playerRun.png",
-    attack: "/ressources/images/mockup/playerAttack.png",
+    name: "Ronin", // Vous pouvez changer le nom ici
+    run: "/ressources/images/mockup/ronin.png",
+    attack: "/ressources/images/mockup/ronin.png",
     filter: "none",
-    scale: 0.12,
-    footAdjust: 4,
+    scale: 0.3, 
+    footAdjust: 14,
+    matchDefaultSize: true, 
+
+    // Configuration pour les animations de course et saut 
+    sheetRunSpec: {
+        cols: 4, rows: 3, // Le spritesheet a 4 colonnes et 3 lignes
+        fw: null, fh: null, 
+        seq: {
+            idle: [0, 1, 2, 3],       
+            run: [4, 5, 6, 7],        
+            jump: [5]                 
+        }
+    },
+
+    // Configuration pour l'attaque (Ligne 3)
+    sheetAttackSpec: {
+        cols: 4, rows: 3,
+        fw: null, fh: null,
+        seq: {
+            attack: [8, 9, 10, 11]  
+        }
+    },
   },
   women: {
     id: "women",
@@ -85,12 +106,15 @@ const ASSETS = {
   enemy: "/ressources/images/mockup/enemies.png",
   bat: "/ressources/images/mockup/bat-enemy.png",
   coins: "/ressources/images/mockup/Coin-Mockup.png",
+  shuriken: "ressources/images/mockup/shuriken.png",
   // NOUVEAUX ASSETS AUDIO
   bgm: "/ressources/audio/level_theme.mp3",
   sfx_jump: "/ressources/audio/jump.wav",
   sfx_coin: "/ressources/audio/coin.wav",
   sfx_hit: "/ressources/audio/hit.wav",
   sfx_damage: "/ressources/audio/damage.wav",
+  sfx_throw: "/ressources/audio/shuriken_throw.wav",
+  sfx_attack: "/ressources/audio/slash.mp3",
 };
 
 // ------- Sprite sheets (ajuste si tes frames diffèrent) -------
@@ -133,6 +157,12 @@ const SHEETS = {
     rows: 2,
     scale: 0.35,
     seq: { spin: [0, 1, 2, 3, 4, 5, 6, 7] },
+  },
+  shuriken: {
+    cols: 1, 
+    rows: 1,
+    scale: 0.5, 
+    seq: { spin: [0] }, 
   },
 };
 

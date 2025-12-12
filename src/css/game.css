@@ -163,6 +163,10 @@ body.game-body {
   font-size: 18px;
 }
 
+#lives {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
 /* OVERLAYS & MODALES */
 .overlay {
   position: fixed;

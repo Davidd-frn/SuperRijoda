@@ -195,6 +195,8 @@ const Level = {
         this.goal.x + 500
     );
     Game.worldW = maxX;
+
+    this.projectiles = [];
     
     // Reset Joueur
     player.x = this.respawnX; 
@@ -211,7 +213,16 @@ const Level = {
 
   update(dt) {
     this.coins.forEach(c => c.update(dt));
-    this.enemies.forEach(e => e.update(dt, this)); // On passe 'this' (Level) pour les collisions
+    this.enemies.forEach(e => e.update(dt, this)); 
+    if (this.projectiles) {
+        for (let i = this.projectiles.length - 1; i >= 0; i--) {
+            const p = this.projectiles[i];
+            p.update(dt, this);
+            if (p.life <= 0) {
+                this.projectiles.splice(i, 1);
+            }
+        }
+    }
     this.spikes.forEach(s => s.update(dt));
     this.springs.forEach(s => s.update(dt));
     this.movingPlatforms.forEach(m => m.update(dt));
@@ -230,6 +241,7 @@ const Level = {
     // Entités
     this.movingPlatforms.forEach(m => m.draw());
     this.coins.forEach(c => c.draw());
+    this.projectiles.forEach(p => p.draw());
     this.enemies.forEach(e => e.draw());
     this.spikes.forEach(s => s.draw());
     this.springs.forEach(s => s.draw());

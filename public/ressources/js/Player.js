@@ -41,6 +41,7 @@ class Player extends Entity {
     this.attackTimer = 0;
     this.attackDuration = 0.25; // Durée de l'animation d'attaque
     this.attackCooldown = 0; // Délai entre deux attaques
+    this.shurikenCooldown = 0; // Délai entre deux shurikens
   }
 
   update(dt, L) {
@@ -79,6 +80,25 @@ class Player extends Entity {
       this.attackCooldown -= dt;
     }
 
+
+    // Gestion du cooldown
+    if (this.shurikenCooldown > 0) this.shurikenCooldown -= dt;
+
+    // TIRE AVEC LA TOUCHE 'F'
+    if (keys.has("KeyF") && this.shurikenCooldown <= 0) {
+        this.shurikenCooldown = 0.5; // Délai de 0.5 seconde entre chaque tir
+        
+        // Créer le shuriken devant le joueur
+        const spawnX = this.facing === 1 ? this.x + this.w : this.x - 24;
+        const s = new Shuriken(spawnX, this.y + 20, this.facing);
+        
+        // Ajouter le shuriken au niveau
+        L.projectiles.push(s);
+        
+        playSFX(ASSETS.sfx_throw);
+    }
+
+
     // Déclenchement avec 'A'
     if (keys.has("KeyA") && !this.isAttacking && this.attackCooldown <= 0) {
       this.isAttacking = true;
@@ -86,7 +106,7 @@ class Player extends Entity {
       this.attackCooldown = 0.4; // Petit délai avant de pouvoir ré-attaquer
       this.sheet = this.sheetAttack;
       this.sheet.set("attack");
-      // playSFX(ASSETS.sfx_attack); // Si vous avez un son d'épée
+      playSFX(ASSETS.sfx_attack); 
     }
 
     // ---- 3. PHYSIQUE ----
@@ -250,6 +270,7 @@ class Player extends Entity {
     this.sheet.step(dt, moving ? 1.6 : 0.9);
   }
 
+
   draw() {
     // Affichage optimisé (Centré + Scale)
     if (this.invul > 0 && Math.floor(this.invul / 5) % 2 === 0) return;
@@ -282,4 +303,5 @@ class Player extends Entity {
     this.sheet.draw(-drawW / 2, -drawH + footAdjust, drawW, drawH);
     ctx.restore();
   }
+  
 }
