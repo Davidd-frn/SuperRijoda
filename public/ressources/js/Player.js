@@ -61,6 +61,7 @@ class Player extends Entity {
       this.facing = -1;
     } else {
       this.dx *= Game.friction;
+      if (!moving && Math.abs(this.dx) < 0.05) this.dx = 0;
     }
 
     // Saut
@@ -261,13 +262,22 @@ class Player extends Entity {
       this.sheet.set("attack");
     } else {
       this.sheet = this.sheetRun;
-      if (!this.onGround) this.sheet.set("jump");
-      else if (moving) this.sheet.set("run");
-      else this.sheet.set("idle");
+      if (!this.onGround) {
+        this.sheet.set("jump");
+      } else if (moving) {
+        this.sheet.set("run");
+      } else {
+        this.sheet.set("idle");
+        // Freeze idle frame so it never flickers when standing still
+        this.sheet.i = 0;
+        this.sheet.t = 0;
+      }
     }
 
     if (this.invul > 0) this.invul--;
-    this.sheet.step(dt, moving ? 1.6 : 0.9);
+    // Only advance animation when moving/acting
+    const shouldAnimate = this.isAttacking || !this.onGround || moving;
+    this.sheet.step(dt, shouldAnimate ? (moving ? 1.6 : 0.9) : 0);
   }
 
 

@@ -78,17 +78,32 @@ function GamePlay() {
           <canvas id="game" width="960" height="540"></canvas>
 
           <div className="hud">
-            <div className="hud-item">
-              <span className="hud-label">SCORE</span>
-              <span id="score">0</span>
+            <div className="hud-group hud-left">
+              <div className="hud-item">
+                <span className="hud-label">TIME</span>
+                <span id="time">0</span>
+              </div>
+              <div className="hud-item">
+                <span className="hud-label">SCORE</span>
+                <span id="score">0</span>
+              </div>
             </div>
-            <div className="hud-item">
-              <span className="hud-label">TIME</span>
-              <span id="time">0</span>
+
+            <div className="hud-item hud-center">
+              <span className="hud-label">LEVEL</span>
+              <span id="level">1</span>
             </div>
-            <div className="hud-item">
+
+            <div className="hud-item hud-right">
               <span className="hud-label">LIVES</span>
-              <span id="lives" style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", sans-serif' }}>❤❤❤</span>
+              <span
+                id="lives"
+                style={{
+                  fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif',
+                }}
+              >
+                🎌🎌🎌
+              </span>
             </div>
           </div>
 

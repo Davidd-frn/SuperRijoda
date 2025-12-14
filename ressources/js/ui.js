@@ -11,9 +11,11 @@ const Game = {
   worldW: 2000, worldH: 540, // Canvas Height
   camX:0,
   resetHUD(){ 
-    UI.score.textContent=this.score; 
+    UI.score.textContent = this.score; 
     UI.time.textContent = this.time.toFixed(2);
-    UI.lives.textContent='❤️'.repeat(this.lives); 
+    if (UI.level && typeof Level !== "undefined") UI.level.textContent = Level.currentId || 1;
+    const LIFE_ICON = '❤️';
+    UI.lives.textContent = LIFE_ICON.repeat(this.lives); 
   },
 
   // AUDIO
@@ -40,6 +42,7 @@ const UI = {
   score: document.getElementById('score'),
   lives: document.getElementById('lives'),
   time:  document.getElementById('time'),
+  level: document.getElementById('level'),
   pause: document.getElementById('pauseOverlay'),
   over:  document.getElementById('gameOver'),
   win:   document.getElementById('winScreen'),
@@ -51,9 +54,6 @@ const UI = {
 // ------- Leaderboard storage -------
 const LEADERBOARD_KEY = 'leaderboard';
 const COUNTRY_KEY = 'playerCountryCode';
-
-
-
 
 function sortLeaderboard(a, b) {
     const scoreA = a.score || 0;
@@ -103,8 +103,6 @@ function saveLeaderboard(score){
     console.warn('Could not save leaderboard', err);
   }
 }
-
-
 
 // ------- Lifecycle Functions -------
 function end(win){

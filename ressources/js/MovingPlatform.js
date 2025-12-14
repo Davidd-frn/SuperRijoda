@@ -31,19 +31,10 @@ class MovingPlatform extends Entity {
 
   draw() {
     const screenX = this.x - Game.camX;
-    
-    // Dessin Violet (comme le mockup)
-    ctx.fillStyle = "#9370DB"; // MediumPurple
+    ctx.fillStyle = "#9370DB"; // fallback color
     ctx.fillRect(screenX, this.y, this.w, this.h);
-    
-    // Bordure pour le style
-    ctx.strokeStyle = "#4B0082"; // Indigo
+    ctx.strokeStyle = "#4B0082";
     ctx.lineWidth = 2;
     ctx.strokeRect(screenX, this.y, this.w, this.h);
-
-    // La flèche (Dessin simple)
-    ctx.fillStyle = "white";
-    ctx.font = "20px Arial";
-    ctx.fillText("↕", screenX + this.w/2 - 6, this.y + 20);
   }
 }

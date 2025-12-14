@@ -197,6 +197,12 @@ addEventListener("keydown", (e) => {
 });
 addEventListener("keyup", (e) => keys.delete(e.code));
 
+// Clear inputs when the tab loses focus to avoid stuck movement keys
+addEventListener("blur", () => keys.clear());
+addEventListener("visibilitychange", () => {
+  if (document.hidden) keys.clear();
+});
+
 function spawnExplosion(x, y, color, count = 10) {
   for (let i = 0; i < count; i++) {
     Game.particles.push(new Particle(x, y, color, 5));

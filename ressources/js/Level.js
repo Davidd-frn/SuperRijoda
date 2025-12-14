@@ -142,6 +142,9 @@ const Level3Data = {
   goal: { x: 2250, y: 200, w: 40, h: 40 }
 };
 
+// --- ASSETS ---
+const goalStarImg = new Image();
+goalStarImg.src = "/ressources/images/mockup/star.png";
 
 
 // --- GESTIONNAIRE DE NIVEAU ---
@@ -153,7 +156,6 @@ const Level = {
   spikes: [],
   springs: [],
   checkpoints: [],
-
   respawnX: 60,
   respawnY: 100,
   goal: null,
@@ -220,11 +222,11 @@ const Level = {
 
   draw() {
 
-    // Plateformes (Noir)
-    ctx.fillStyle = '#000000';
+    // Plateformes
     for(const p of this.platforms) {
+      const px = p.x - Game.camX;
       ctx.fillStyle = p.oneWay ? '#87CEFA' : '#000000';
-      ctx.fillRect(p.x - Game.camX, p.y, p.w, p.h);
+      ctx.fillRect(px, p.y, p.w, p.h);
     }
 
     // Entités
@@ -237,9 +239,13 @@ const Level = {
 
     // Objectif (Étoile jaune)
     if(this.goal) {
-       ctx.fillStyle = '#f2c14e'; // Jaune
-       // Tu peux dessiner une image ici si tu as une étoile.png
-       ctx.fillRect(this.goal.x - Game.camX, this.goal.y, this.goal.w, this.goal.h);
+       const gx = this.goal.x - Game.camX;
+       if (goalStarImg.complete && goalStarImg.naturalWidth) {
+         ctx.drawImage(goalStarImg, gx, this.goal.y, this.goal.w, this.goal.h);
+       } else {
+         ctx.fillStyle = '#f2c14e'; // fallback jaune
+         ctx.fillRect(gx, this.goal.y, this.goal.w, this.goal.h);
+       }
     }
   },
 

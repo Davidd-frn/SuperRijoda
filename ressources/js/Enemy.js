@@ -1,4 +1,4 @@
-class Enemy extends Entity{
+class Enemy extends Entity {
   constructor(x, y) {
     super(x, y, 64, 64);
     this.sheet = new Sheet(ASSETS.enemy, SHEETS.enemy);
@@ -10,50 +10,54 @@ class Enemy extends Entity{
   update(dt, L) {
     if (this.dead) return;
 
-    // 1. Calculer la future position
-    const nextX = this.x + (this.speed * this.dir);
-    
-    // 2. DÉTECTION DU VIDE (Cliff Detection)
-    // On place un "capteur" juste devant les pieds de l'ennemi
-    // Si dir = 1 (droite), on regarde à droite du sprite. Si dir = -1, à gauche.
-    const lookAheadX = this.dir > 0 ? (this.x + this.w + 5) : (this.x - 5);
     const lookAheadY = this.y + this.h + 5; // Un peu en dessous des pieds
 
-    let groundAhead = false;
-
-    // On vérifie si ce point (lookAheadX, lookAheadY) touche une plateforme
-    for (const p of L.platforms) {
-      if (lookAheadX >= p.x && lookAheadX <= p.x + p.w &&
-          lookAheadY >= p.y && lookAheadY <= p.y + p.h) {
-        groundAhead = true;
-        break;
-      }
-    }
-
-    // 3. DÉTECTION DES MURS
-    // On vérifie aussi si on va foncer dans un mur
-    let wallAhead = false;
-    const wallSensorX = this.dir > 0 ? (this.x + this.w) : this.x;
-    for (const p of L.platforms) {
-        // Si le capteur latéral touche une plateforme (mais pas par le dessus)
-        if (AABB({x: nextX, y: this.y, w: this.w, h: this.h}, p)) {
-            // Vérifie qu'on n'est pas juste posé dessus
-            if (this.y + this.h > p.y + 5) { 
-                wallAhead = true; 
-            }
+    // Retourne l'info de collision/sol pour une direction donnÃ©e
+    const probe = (dir) => {
+      const lookAheadX = dir > 0 ? this.x + this.w + 5 : this.x - 5;
+      let ground = false;
+      for (const p of L.platforms) {
+        if (
+          lookAheadX >= p.x &&
+          lookAheadX <= p.x + p.w &&
+          lookAheadY >= p.y &&
+          lookAheadY <= p.y + p.h
+        ) {
+          ground = true;
+          break;
         }
+      }
+
+      let wall = false;
+      const nextRect = { x: this.x + this.speed * dir, y: this.y, w: this.w, h: this.h };
+      for (const p of L.platforms) {
+        if (AABB(nextRect, p)) {
+          if (this.y + this.h > p.y + 5) {
+            wall = true;
+            break;
+          }
+        }
+      }
+
+      return { ground, wall };
+    };
+
+    const forward = probe(this.dir);
+    const backward = probe(-this.dir);
+
+    const canForward = forward.ground && !forward.wall;
+    const canBackward = backward.ground && !backward.wall;
+    const isIdle = !canForward && !canBackward;
+
+    // Mouvement horizontal : reste immobile s'il n'a pas de place
+    if (!isIdle) {
+      if (!canForward && canBackward) {
+        this.dir *= -1;
+      }
+      this.x += this.speed * this.dir;
     }
 
-    // 4. PRISE DE DÉCISION
-    // S'il n'y a pas de sol devant OU s'il y a un mur -> Demi-tour
-    if (!groundAhead || wallAhead) {
-      this.dir *= -1;
-    } else {
-      // Sinon, on avance
-      this.x += (this.speed * this.dir);
-    }
-
-    // Physique Verticale (Gravité) pour le spawn initial
+    // Physique Verticale (GravitÃ©) pour le spawn initial
     this.dy += Game.gravity;
     this.y += this.dy;
 
@@ -68,28 +72,31 @@ class Enemy extends Entity{
     }
 
     // Animation
-    this.sheet.set('walk');
-    this.sheet.step(dt, 0.8);
-    
-    // Si je vais à gauche, je retourne l'image
-    // (Nécessite d'ajouter la logique de scale(-1,1) dans draw si voulu, 
-    // mais pour l'instant ça marche sans)
+    this.sheet.set(isIdle ? "idle" : "walk");
+    // Si immobile (idle), on ne dÃ©file pas l'animation
+    const animSpeed = isIdle ? 0 : 0.8;
+    this.sheet.step(dt, animSpeed);
+
+    // Si je vais Ã  gauche, je retourne l'image
+    // (NÃ©cessite d'ajouter la logique de scale(-1,1) dans draw si voulu,
+    // mais pour l'instant Ã§a marche sans)
   }
 
   draw() {
     if (!this.dead) {
-        // Ajout du miroir pour l'ennemi aussi
-        ctx.save();
-        if(this.dir === 1) { // Si l'image de base regarde à gauche, inversez cette condition
-             // Normal
-             this.sheet.draw(this.x - Game.camX, this.y, this.w, this.h);
-        } else {
-             // Miroir
-             ctx.translate(this.x - Game.camX + this.w/2, this.y);
-             ctx.scale(-1, 1);
-             this.sheet.draw(-this.w/2, 0, this.w, this.h);
-        }
-        ctx.restore();
+      // Ajout du miroir pour l'ennemi aussi
+      ctx.save();
+      if (this.dir === 1) {
+        // Si l'image de base regarde Ã  gauche, inversez cette condition
+        // Normal
+        this.sheet.draw(this.x - Game.camX, this.y, this.w, this.h);
+      } else {
+        // Miroir
+        ctx.translate(this.x - Game.camX + this.w / 2, this.y);
+        ctx.scale(-1, 1);
+        this.sheet.draw(-this.w / 2, 0, this.w, this.h);
+      }
+      ctx.restore();
     }
   }
 }

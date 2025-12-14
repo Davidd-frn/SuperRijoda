@@ -146,14 +146,7 @@ function loop(t) {
 
   // 4. Vérifier la Victoire (Toucher l'étoile)
   if (Level.goal && AABB(player.rect(), Level.goal)) {
-      console.log("Niveau terminé !");
-      Level.next(); // Charge le niveau suivant
-      
-      // On replace le joueur au début pour le prochain niveau
-      player.x = 60; 
-      player.y = 300; 
-      player.dx = 0; 
-      player.dy = 0;
+      advanceLevel();
   }
 
   // --- DRAW (DESSIN) ---
@@ -183,3 +176,12 @@ Game.startBGM();
 
 // 4. C'est parti !
 requestAnimationFrame(loop);
+
+function advanceLevel() {
+  Level.next();
+  player.x = 60;
+  player.y = 300;
+  player.dx = 0;
+  player.dy = 0;
+  if (typeof Game !== "undefined" && Game.resetHUD) Game.resetHUD();
+}
