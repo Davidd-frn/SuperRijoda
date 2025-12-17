@@ -1,10 +1,12 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Link, useNavigate } from "react-router-dom";
 import "./css/game.css";
 import { loadScriptsSequential, unloadScripts } from "./lib/loadScripts";
 
 function GameMenu() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const stopAllAudio = () => {
     window.__stopGameLoop = true;
@@ -43,12 +45,19 @@ function GameMenu() {
     loadScriptsSequential([
       "/ressources/js/geo.js",
       "/ressources/js/script.js",
-    ]).catch((err) => console.error(err));
+    ]).then(() => {
+        if (location.state && location.state.autoOpen) {
+            const selectModal = document.getElementById("characterSelect");
+            if (selectModal) {
+                selectModal.hidden = false;
+            }
+        }
+    }).catch((err) => console.error(err));
 
     return () => {
       document.body.classList.remove("game-body");
     };
-  }, []);
+  }, [location]);
 
   return (
     <div className="game-shell">

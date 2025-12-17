@@ -82,8 +82,12 @@ function Commands() {
           </div>
 
           <div className="commands-actions">
-            <Link to="/play" className="primary start-btn btn">
-              Start Level 1
+            <Link 
+              to="/game" 
+              state={{ autoOpen: true }} 
+              className="primary start-btn btn"
+            >
+              Select Character
             </Link>
           </div>
         </section>

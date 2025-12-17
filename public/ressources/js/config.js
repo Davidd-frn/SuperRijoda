@@ -52,7 +52,7 @@ const CHARACTER_LIBRARY = {
         fw: null, fh: null, // Laisse le jeu calculer la taille des frames
         seq: {
             idle: [0],               // Frame statique
-            run: [0, 1, 2, 3, 4, 5, 6, 7], // Les 2 premières lignes
+            run: [0, 1, 2, 3, 4, 5, 7], 
             jump: [2]                // Une frame de saut arbitraire
         }
     },
@@ -77,8 +77,26 @@ const CHARACTER_LIBRARY = {
     matchDefaultSize: true, // force same on-screen size as default
     footAdjust: 14, // push sprite further down so feet touch ground
     // Use the same grid as default but let frame size auto-calc so only one frame shows at a time
-    sheetRunSpec: { cols: 4, rows: 3, fw: null, fh: null, seq: { idle: [8], run: [0, 1, 2, 3], jump: [6] } },
-    sheetAttackSpec: { cols: 4, rows: 3, fw: null, fh: null, seq: { attack: [4, 5, 6, 7] } },
+    sheetRunSpec: { 
+      cols: 4, 
+      rows: 3, 
+      fw: null, 
+      fh: null, 
+      seq: { 
+        idle: [8], 
+        run: [0, 1, 2, 3], 
+        jump: [6] 
+      } 
+    },
+    sheetAttackSpec: { 
+      cols: 4, 
+      rows: 3, 
+      fw: null, 
+      fh: null, 
+      seq: { 
+        attack: [4, 5, 6, 7] 
+      } 
+    },
   },
 };
 
