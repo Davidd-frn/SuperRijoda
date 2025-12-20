@@ -39,20 +39,18 @@ function GameMenu() {
   };
 
   useEffect(() => {
-    // Beim Betreten des Menüs immer sicherstellen, dass nichts weiterläuft
     stopAllAudio();
     document.body.classList.add("game-body");
-    loadScriptsSequential([
-      "/ressources/js/geo.js",
-      "/ressources/js/script.js",
-    ]).then(() => {
+    loadScriptsSequential(["/ressources/js/geo.js", "/ressources/js/script.js"])
+      .then(() => {
         if (location.state && location.state.autoOpen) {
-            const selectModal = document.getElementById("characterSelect");
-            if (selectModal) {
-                selectModal.hidden = false;
-            }
+          const selectModal = document.getElementById("characterSelect");
+          if (selectModal) {
+            selectModal.hidden = false;
+          }
         }
-    }).catch((err) => console.error(err));
+      })
+      .catch((err) => console.error(err));
 
     return () => {
       document.body.classList.remove("game-body");
@@ -85,7 +83,7 @@ function GameMenu() {
 
       {/* Character selection overlay */}
       <div id="characterSelect" className="overlay" hidden>
-        <div className="modal-box select">
+        <form id="characterForm" className="modal-box select">
           <h1>Choose Your Character</h1>
           <p className="select-subtitle">
             Pick a style, then drag &amp; drop it into the slot. Set your name
@@ -101,8 +99,13 @@ function GameMenu() {
                 id="playerName"
                 name="playerName"
                 type="text"
+                inputMode="text"
+                autoComplete="nickname"
+                minLength="3"
                 maxLength="20"
+                pattern="^[A-Za-z0-9 _-]{3,20}$"
                 placeholder="Your name"
+                required
               />
               <img
                 id="geoFlag"
@@ -189,27 +192,51 @@ function GameMenu() {
 
           <div className="drop-area">
             <div className="drop-label">Drag a card into the drop slot</div>
-            <div id="characterDropSlot" className="drop-slot" aria-live="polite">
+            <div
+              id="characterDropSlot"
+              className="drop-slot"
+              aria-live="polite"
+              tabIndex="0"
+            >
               Drop character here
             </div>
-            <div id="characterDropSelected" className="drop-selected" hidden></div>
+            <div
+              id="characterDropSelected"
+              className="drop-selected"
+              hidden
+            ></div>
             <div id="characterPreview" className="drop-preview" hidden>
               <div id="characterPreviewFrame" className="frame-preview"></div>
               <div className="drop-preview-label">
                 <span id="characterPreviewName"></span>
               </div>
             </div>
+            <div
+              id="characterSelectionError"
+              className="form-error"
+              role="alert"
+              hidden
+            ></div>
           </div>
 
           <div className="character-actions">
-            <button id="confirmCharacter" className="btn primary disabled" disabled>
+            <button
+              id="confirmCharacter"
+              className="btn primary disabled"
+              type="submit"
+              disabled
+            >
               Play
             </button>
-            <button id="closeCharacterSelect" className="btn secondary">
+            <button
+              id="closeCharacterSelect"
+              className="btn secondary"
+              type="button"
+            >
               Cancel
             </button>
           </div>
-        </div>
+        </form>
       </div>
 
       {/* Leaderboard Modal */}
@@ -217,7 +244,9 @@ function GameMenu() {
         <div className="modal-box select">
           <h1>Leaderboard</h1>
           <div id="leaderboardList" className="leaderboard-list"></div>
-          <button id="leaderboardClose" className="btn secondary">Close</button>
+          <button id="leaderboardClose" className="btn secondary">
+            Close
+          </button>
         </div>
       </div>
     </div>

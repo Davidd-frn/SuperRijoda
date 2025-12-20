@@ -142,6 +142,13 @@ const Level3Data = {
   goal: { x: 2250, y: 200, w: 40, h: 40 }
 };
 
+// Registry for level data (preserves numeric order for progression)
+const LEVEL_REGISTRY = {
+  1: Level1Data,
+  2: Level2Data,
+  3: Level3Data,
+};
+
 // --- ASSETS ---
 const goalStarImg = new Image();
 goalStarImg.src = "/ressources/images/mockup/star.png";
@@ -251,10 +258,15 @@ const Level = {
 
   // Passage au niveau suivant
   next() {
-    if (this.currentId === 1) this.init(Level2Data);
-    else if (this.currentId === 2) this.init(Level3Data);
-    else {
-      end(true); // Fin du jeu, victoire !
+    const entries = Object.entries(LEVEL_REGISTRY);
+    const currentIdx = entries.findIndex(
+      ([id]) => Number(id) === this.currentId
+    );
+    const nextEntry = entries[currentIdx + 1];
+    if (nextEntry) {
+      this.init(nextEntry[1]);
+      return;
     }
+    end(true); // Fin du jeu, victoire !
   }
 };

@@ -11,10 +11,12 @@
   const previewBox = document.getElementById("characterPreview");
   const previewFrame = document.getElementById("characterPreviewFrame");
   const previewName = document.getElementById("characterPreviewName");
+  const form = document.getElementById("characterForm");
   const nameInput = document.getElementById("playerName");
   const geoStatus = document.getElementById("geoStatus");
   const geoFlag = document.getElementById("geoFlag");
   const geoCountry = document.getElementById("geoCountry");
+  const selectionError = document.getElementById("characterSelectionError");
   const leaderboardBtn = document.getElementById("leaderboardBtn");
   const leaderboardModal = document.getElementById("leaderboardModal");
   const leaderboardList = document.getElementById("leaderboardList");
@@ -22,6 +24,7 @@
 
   const STORAGE_KEY = "selectedCharacter";
   const USERNAME_KEY = "playerName";
+  const LEADERBOARD_KEY = "leaderboard";
 
   if (!startButton || !overlay) return;
 
@@ -34,6 +37,31 @@
     return (
       card?.querySelector(".character-name")?.textContent?.trim() || id || ""
     );
+  };
+
+  const sanitizeText = (val, fallback = "") => {
+    if (typeof val !== "string") return fallback;
+    return val.replace(/[<>]/g, "").trim() || fallback;
+  };
+
+  const clearSelectionError = () => {
+    if (selectionError) {
+      selectionError.hidden = true;
+      selectionError.textContent = "";
+    }
+    if (dropSlot) {
+      dropSlot.setAttribute("aria-invalid", "false");
+    }
+  };
+
+  const showSelectionError = (message) => {
+    if (selectionError) {
+      selectionError.hidden = false;
+      selectionError.textContent = message;
+    }
+    if (dropSlot) {
+      dropSlot.setAttribute("aria-invalid", "true");
+    }
   };
 
   const updateConfirmState = () => {
@@ -60,6 +88,7 @@
     highlightSelection();
     updateDropSelected();
     updatePreview();
+    clearSelectionError();
     updateConfirmState();
   };
 
@@ -97,11 +126,13 @@
   const openOverlay = (event) => {
     event.preventDefault();
     overlay.hidden = false;
+    form?.reset();
     selected = null;
     if (nameInput) {
       const storedName = localStorage.getItem(USERNAME_KEY) || "";
       nameInput.value = storedName;
     }
+    clearSelectionError();
     if (window.Geo?.initCountryFlag) {
       window.Geo.initCountryFlag({
         statusEl: geoStatus,
@@ -111,6 +142,7 @@
     }
     highlightSelection();
     updateDropSelected();
+    updatePreview();
     updateConfirmState();
   };
 
@@ -164,6 +196,74 @@
       .join("");
   };
 
+  const renderLeaderboardSafe = () => {
+    if (!leaderboardList) return;
+    let entries = [];
+    try {
+      entries = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
+    } catch (e) {
+      entries = [];
+    }
+    leaderboardList.replaceChildren();
+    if (!entries.length) {
+      const empty = document.createElement("div");
+      empty.className = "leaderboard-empty";
+      empty.textContent = "No scores yet.";
+      leaderboardList.appendChild(empty);
+      return;
+    }
+    entries.slice(0, 10).forEach((e, idx) => {
+      const row = document.createElement("div");
+      row.className = "leaderboard-row";
+
+      const left = document.createElement("div");
+      left.className = "leaderboard-left";
+
+      const rank = document.createElement("span");
+      rank.className = "leaderboard-rank";
+      rank.textContent = `#${idx + 1}`;
+      left.appendChild(rank);
+
+      const flagUrl = e.countryCode
+        ? `https://flagcdn.com/24x18/${String(e.countryCode).toLowerCase()}.png`
+        : "";
+      const flag = document.createElement("img");
+      flag.className = "leaderboard-flag";
+      if (flagUrl) {
+        flag.src = flagUrl;
+        flag.alt = sanitizeText(e.countryCode, "");
+      } else {
+        flag.hidden = true;
+      }
+      left.appendChild(flag);
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "leaderboard-name";
+      nameSpan.textContent = sanitizeText(e.name, "Anonymous");
+      left.appendChild(nameSpan);
+
+      const right = document.createElement("div");
+      right.className = "leaderboard-right";
+
+      const scoreSpan = document.createElement("span");
+      scoreSpan.className = "leaderboard-score";
+      scoreSpan.textContent = `${Number(e.score) || 0} pts`;
+      right.appendChild(scoreSpan);
+
+      const timeSpan = document.createElement("span");
+      timeSpan.className = "leaderboard-time";
+      timeSpan.textContent =
+        typeof e.time === "number" && isFinite(e.time)
+          ? `${e.time.toFixed(3)}s`
+          : "--";
+      right.appendChild(timeSpan);
+
+      row.appendChild(left);
+      row.appendChild(right);
+      leaderboardList.appendChild(row);
+    });
+  };
+
   characterCards.forEach((card) => {
     card.addEventListener("dragstart", (e) => {
       e.dataTransfer?.setData("text/plain", card.dataset.character);
@@ -204,9 +304,14 @@
     });
   }
 
-  confirmBtn?.addEventListener("click", () => {
-    if (!selected || !hasName()) return;
-    const trimmedName = nameInput.value.trim();
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!selected) {
+      showSelectionError("Please select a character to continue.");
+      dropSlot?.focus();
+      return;
+    }
+    const trimmedName = sanitizeText(nameInput?.value || "", "");
     try {
       localStorage.setItem(USERNAME_KEY, trimmedName);
     } catch (e) {}
@@ -214,18 +319,21 @@
     window.location.href = "/play";
   });
 
-  nameInput?.addEventListener("input", updateConfirmState);
+  nameInput?.addEventListener("input", () => {
+    clearSelectionError();
+    updateConfirmState();
+  });
 
   closeBtn?.addEventListener("click", closeOverlay);
   startButton.addEventListener("click", openOverlay);
 
   leaderboardBtn?.addEventListener("click", (e) => {
     e.preventDefault();
-    renderLeaderboard();
+    renderLeaderboardSafe();
     if (leaderboardModal) leaderboardModal.hidden = false;
   });
 
-  leaderboardClose?.addEventListener("click", () => {
-    if (leaderboardModal) leaderboardModal.hidden = true;
-  });
+    leaderboardClose?.addEventListener("click", () => {
+      if (leaderboardModal) leaderboardModal.hidden = true;
+    });
 })();

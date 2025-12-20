@@ -645,6 +645,12 @@ body.game-body {
   color: #000;
 }
 
+.form-error {
+  font-size: 11px;
+  color: #e64e4e;
+  font-weight: 700;
+}
+
 .drop-preview {
   display: flex;
   align-items: center;

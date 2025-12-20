@@ -84,9 +84,15 @@ function App() {
         <Route path="/game" element={<GameMenu />} />
         <Route path="/commands" element={<Commands />} />
         <Route path="/play" element={<GamePlay />} />
-        <Route path="/loadingScreen.html" element={<Navigate to="/game" replace />} />
+        <Route
+          path="/loadingScreen.html"
+          element={<Navigate to="/game" replace />}
+        />
         <Route path="/game.html" element={<Navigate to="/play" replace />} />
-        <Route path="/commands.html" element={<Navigate to="/commands" replace />} />
+        <Route
+          path="/commands.html"
+          element={<Navigate to="/commands" replace />}
+        />
       </Routes>
 
       {!hideChrome && <Footer />}
