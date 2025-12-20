@@ -183,6 +183,7 @@ const Level = {
   goal: null,
   currentId: 1,
   bgColor: "#e3a576",
+  loopCount: 0, // number of completed full cycles for endless mode
 
   // Charge un niveau depuis les données (Data)
   init(data) {
@@ -199,15 +200,21 @@ const Level = {
       (m) => new MovingPlatform(m.x, m.y, m.w, m.h, m.rangeX, m.rangeY, m.speed)
     );
 
+    const difficulty = 1 + this.loopCount * 0.15; // progressive scaling per loop
     this.coins = data.coins.map((c) => new Coin(c.x, c.y));
     this.enemies = (data.enemies || []).map((e) => {
       if (e.type === "bat") {
-        return new Bat(e.x, e.y, e.dist);
+        const dist = e.dist ? e.dist * (1 + this.loopCount * 0.1) : e.dist;
+        return new Bat(e.x, e.y, dist);
       }
 
       const en = new Enemy(e.x, e.y);
       if (e.type === "patrol") en.dist = e.dist;
+      en.speed *= difficulty;
       return en;
+    });
+    this.movingPlatforms.forEach((m) => {
+      m.speed *= difficulty;
     });
     this.spikes = (data.spikes || []).map((s) => new Spike(s.x, s.y));
     this.springs = (data.springs || []).map((s) => new Spring(s.x, s.y));
@@ -229,6 +236,11 @@ const Level = {
     player.y = this.respawnY;
     player.dx = 0;
     player.dy = 0;
+  },
+
+  getDisplayLevel() {
+    const total = Object.keys(LEVEL_REGISTRY).length || 1;
+    return this.currentId + (this.loopCount || 0) * total;
   },
 
   setRespawn(x, y) {
@@ -286,7 +298,9 @@ const Level = {
 
   // Passage au niveau suivant
   next() {
-    const entries = Object.entries(LEVEL_REGISTRY);
+    const entries = Object.entries(LEVEL_REGISTRY).sort(
+      ([a], [b]) => Number(a) - Number(b)
+    );
     const currentIdx = entries.findIndex(
       ([id]) => Number(id) === this.currentId
     );
@@ -295,6 +309,13 @@ const Level = {
       this.init(nextEntry[1]);
       return;
     }
-    end(true); // Fin du jeu, victoire !
+    // Boucle infinie : on revient au premier niveau et on augmente la difficultÃ©
+    this.loopCount += 1;
+    const firstEntry = entries[0];
+    if (firstEntry) {
+      this.init(firstEntry[1]);
+      return;
+    }
+    end(true); // fallback
   },
 };

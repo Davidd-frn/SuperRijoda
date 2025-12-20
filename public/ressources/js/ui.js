@@ -13,7 +13,12 @@ const Game = {
   resetHUD(){ 
     UI.score.textContent = this.score; 
     UI.time.textContent = this.time.toFixed(2);
-    if (UI.level && typeof Level !== "undefined") UI.level.textContent = Level.currentId || 1;
+    if (UI.level && typeof Level !== "undefined") {
+      const displayLevel = typeof Level.getDisplayLevel === "function"
+        ? Level.getDisplayLevel()
+        : (Level.currentId || 1);
+      UI.level.textContent = displayLevel;
+    }
     const LIFE_ICON = '❤️';
     UI.lives.textContent = LIFE_ICON.repeat(this.lives); 
   },
