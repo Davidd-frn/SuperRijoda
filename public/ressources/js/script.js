@@ -45,15 +45,32 @@
   let firebaseApi = null;
   const getFirestoreApi = async () => {
     if (firebaseApi) return firebaseApi;
-    const [{ initializeApp }, firestore] = await Promise.all([
+    const [{ initializeApp }, firestore, authModule] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"),
+      import("https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"),
     ]);
     const app = initializeApp(FIREBASE_CONFIG);
     const { getFirestore, collection, getDocs, query, orderBy, limit } =
       firestore;
+    const { getAuth, signInAnonymously } = authModule;
     const db = getFirestore(app);
-    firebaseApi = { db, collection, getDocs, query, orderBy, limit };
+    const auth = getAuth(app);
+    // Anonymous login so request.auth != null for Firestore rules.
+    try {
+      await signInAnonymously(auth);
+    } catch (e) {
+      console.warn("Anonymous auth failed", e);
+    }
+    firebaseApi = {
+      db,
+      auth,
+      collection,
+      getDocs,
+      query,
+      orderBy,
+      limit,
+    };
     return firebaseApi;
   };
 

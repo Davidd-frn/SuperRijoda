@@ -72,14 +72,23 @@ const FIREBASE_CONFIG = {
 let firebaseApi = null;
 async function getFirestoreApi() {
   if (firebaseApi) return firebaseApi;
-  const [{ initializeApp }, firestore] = await Promise.all([
+  const [{ initializeApp }, firestore, authModule] = await Promise.all([
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"),
+    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"),
   ]);
   const app = initializeApp(FIREBASE_CONFIG);
   const { getFirestore, collection, doc, getDoc, setDoc } = firestore;
+  const { getAuth, signInAnonymously } = authModule;
   const db = getFirestore(app);
-  firebaseApi = { db, collection, doc, getDoc, setDoc };
+  const auth = getAuth(app);
+  // Ensure request.auth is present for Firestore writes guarded by rules.
+  try {
+    await signInAnonymously(auth);
+  } catch (e) {
+    console.warn("Anonymous auth failed", e);
+  }
+  firebaseApi = { db, auth, collection, doc, getDoc, setDoc };
   return firebaseApi;
 }
 
@@ -87,12 +96,26 @@ function betterEntry(next, current) {
   if (!current) return next;
   const scoreNext = next?.score ?? 0;
   const scoreCur = current?.score ?? 0;
-  if (scoreNext !== scoreCur) return scoreNext > scoreCur ? next : current;
   const timeNext = Number.isFinite(next?.time) ? next.time : Infinity;
   const timeCur = Number.isFinite(current?.time) ? current.time : Infinity;
-  if (timeNext !== timeCur) return timeNext < timeCur ? next : current;
-  // If score/time are equal, prefer the newer entry to refresh metadata (e.g., countryCode).
-  return next;
+
+  const betterScore = scoreNext > scoreCur;
+  const betterTimeWithSameScore = scoreNext === scoreCur && timeNext < timeCur;
+  const keepCurrent = !betterScore && !betterTimeWithSameScore;
+
+  // Always refresh metadata (e.g., countryCode) from the latest submission.
+  const mergedMeta = {
+    ...current,
+    countryCode: next?.countryCode || current?.countryCode || "",
+    name: next?.name || current?.name,
+  };
+
+  if (keepCurrent) {
+    return mergedMeta; // keep old score/time, but update meta
+  }
+
+  // Take the better performance, but keep refreshed meta.
+  return { ...next, ...mergedMeta };
 }
 
 async function saveLeaderboardRemote(entry) {
@@ -108,7 +131,17 @@ async function saveLeaderboardRemote(entry) {
     const snap = await getDoc(docRef);
     const current = snap.exists() ? snap.data() : null;
     const best = betterEntry(entry, current);
-    await setDoc(docRef, { ...best, updatedAt: Date.now() });
+    // Only send fields allowed by Firestore rules.
+    const payload = {
+      name: String(best?.name || "Anonymous").slice(0, 50),
+      score: Number(best?.score) || 0,
+      time: Number.isFinite(best?.time) ? best.time : null,
+      countryCode:
+        typeof best?.countryCode === "string" && best.countryCode.length === 2
+          ? best.countryCode.toUpperCase()
+          : "",
+    };
+    await setDoc(docRef, payload);
   } catch (err) {
     console.warn("Could not persist to Firestore", err);
   }
