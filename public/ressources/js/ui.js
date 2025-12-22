@@ -59,6 +59,58 @@ const UI = {
 // ------- Leaderboard storage -------
 const LEADERBOARD_KEY = 'leaderboard';
 const COUNTRY_KEY = 'playerCountryCode';
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBHxxKPcTca5MKyBGw7KlGQpkv8gKZPd08",
+  authDomain: "super-rijoda.firebaseapp.com",
+  projectId: "super-rijoda",
+  storageBucket: "super-rijoda.firebasestorage.app",
+  messagingSenderId: "511869869048",
+  appId: "1:511869869048:web:ff06987dee9f2b8b71d40d",
+  measurementId: "G-W4HZR80TB0",
+};
+
+let firebaseApi = null;
+async function getFirestoreApi() {
+  if (firebaseApi) return firebaseApi;
+  const [{ initializeApp }, firestore] = await Promise.all([
+    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"),
+  ]);
+  const app = initializeApp(FIREBASE_CONFIG);
+  const { getFirestore, collection, doc, getDoc, setDoc } = firestore;
+  const db = getFirestore(app);
+  firebaseApi = { db, collection, doc, getDoc, setDoc };
+  return firebaseApi;
+}
+
+function betterEntry(next, current) {
+  if (!current) return next;
+  const scoreNext = next?.score ?? 0;
+  const scoreCur = current?.score ?? 0;
+  if (scoreNext !== scoreCur) return scoreNext > scoreCur ? next : current;
+  const timeNext = Number.isFinite(next?.time) ? next.time : Infinity;
+  const timeCur = Number.isFinite(current?.time) ? current.time : Infinity;
+  return timeNext < timeCur ? next : current;
+}
+
+async function saveLeaderboardRemote(entry) {
+  try {
+    const { db, collection, doc, getDoc, setDoc } = await getFirestoreApi();
+    const colRef = collection(db, "leaderboard");
+    const docId =
+      (entry.name || "player")
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, "_")
+        .slice(0, 32) || "player";
+    const docRef = doc(colRef, docId);
+    const snap = await getDoc(docRef);
+    const current = snap.exists() ? snap.data() : null;
+    const best = betterEntry(entry, current);
+    await setDoc(docRef, { ...best, updatedAt: Date.now() });
+  } catch (err) {
+    console.warn("Could not persist to Firestore", err);
+  }
+}
 
 function sortLeaderboard(a, b) {
     const scoreA = a.score || 0;
@@ -99,14 +151,16 @@ function saveLeaderboard(score){
         existing.countryCode = countryCode || existing.countryCode || '';
       }
     } else {
-      entries.push({ name, score, time, location, countryCode });
-    }
-
-    entries.sort(sortLeaderboard);
-    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
-  } catch (err){
-    console.warn('Could not save leaderboard', err);
+    entries.push({ name, score, time, location, countryCode });
   }
+
+  entries.sort(sortLeaderboard);
+  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+  // Best effort remote save; non-blocking for gameplay.
+  saveLeaderboardRemote({ name, score, time, countryCode });
+} catch (err){
+  console.warn('Could not save leaderboard', err);
+}
 }
 
 // ------- Lifecycle Functions -------

@@ -25,6 +25,31 @@
   const STORAGE_KEY = "selectedCharacter";
   const USERNAME_KEY = "playerName";
   const LEADERBOARD_KEY = "leaderboard";
+  const LEADERBOARD_URL = "/ressources/leaderboard.json";
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBHxxKPcTca5MKyBGw7KlGQpkv8gKZPd08",
+    authDomain: "super-rijoda.firebaseapp.com",
+    projectId: "super-rijoda",
+    storageBucket: "super-rijoda.firebasestorage.app",
+    messagingSenderId: "511869869048",
+    appId: "1:511869869048:web:ff06987dee9f2b8b71d40d",
+    measurementId: "G-W4HZR80TB0",
+  };
+
+  let firebaseApi = null;
+  const getFirestoreApi = async () => {
+    if (firebaseApi) return firebaseApi;
+    const [{ initializeApp }, firestore] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"),
+    ]);
+    const app = initializeApp(FIREBASE_CONFIG);
+    const { getFirestore, collection, getDocs, query, orderBy, limit } =
+      firestore;
+    const db = getFirestore(app);
+    firebaseApi = { db, collection, getDocs, query, orderBy, limit };
+    return firebaseApi;
+  };
 
   if (!startButton || !overlay) return;
 
@@ -42,6 +67,101 @@
   const sanitizeText = (val, fallback = "") => {
     if (typeof val !== "string") return fallback;
     return val.replace(/[<>]/g, "").trim() || fallback;
+  };
+
+  const sortLeaderboard = (a, b) => {
+    const scoreA = Number(a?.score) || 0;
+    const scoreB = Number(b?.score) || 0;
+    if (scoreA !== scoreB) return scoreB - scoreA;
+    const timeA = Number.isFinite(a?.time) ? a.time : Infinity;
+    const timeB = Number.isFinite(b?.time) ? b.time : Infinity;
+    return timeA - timeB;
+  };
+
+  const normalizeEntry = (entry) => {
+    if (!entry || typeof entry !== "object") return null;
+    const name = sanitizeText(entry.name, "Anonymous");
+    const score = Number(entry.score) || 0;
+    const time = Number(entry.time);
+    const countryCode = sanitizeText(entry.countryCode || "", "").toUpperCase();
+    return {
+      name,
+      score,
+      time: Number.isFinite(time) ? time : null,
+      countryCode,
+    };
+  };
+
+  const pickBestEntry = (existing, next) => {
+    if (!existing) return next;
+    if (next.score !== existing.score) {
+      return next.score > existing.score ? next : existing;
+    }
+    const existingTime = Number.isFinite(existing.time)
+      ? existing.time
+      : Infinity;
+    const nextTime = Number.isFinite(next.time) ? next.time : Infinity;
+    return nextTime < existingTime ? next : existing;
+  };
+
+  const mergeEntries = (...entryLists) => {
+    const bestByName = new Map();
+    entryLists.flat().forEach((raw) => {
+      const entry = normalizeEntry(raw);
+      if (!entry) return;
+      const currentBest = bestByName.get(entry.name);
+      bestByName.set(entry.name, pickBestEntry(currentBest, entry));
+    });
+    return Array.from(bestByName.values()).sort(sortLeaderboard);
+  };
+
+  const fetchLeaderboardFile = async () => {
+    try {
+      const res = await fetch(LEADERBOARD_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error("failed");
+      const data = await res.json();
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.entries)) return data.entries;
+    } catch (err) {}
+    return [];
+  };
+
+  const fetchLeaderboardRemote = async () => {
+    try {
+      const { db, collection, getDocs, query, orderBy, limit } =
+        await getFirestoreApi();
+      const colRef = collection(db, "leaderboard");
+      // Best effort: order by score, fetch a handful, final sort happens client-side.
+      const q = query(colRef, orderBy("score", "desc"), limit(50));
+      const snap = await getDocs(q);
+      return snap.docs.map((d) => d.data());
+    } catch (err) {
+      console.warn("Remote leaderboard unavailable", err);
+      return [];
+    }
+  };
+
+  const readLocalLeaderboard = () => {
+    try {
+      return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const loadLeaderboard = async () => {
+    const [remoteEntries, fileEntries, localEntries] = await Promise.all([
+      fetchLeaderboardRemote(),
+      fetchLeaderboardFile(),
+      Promise.resolve(readLocalLeaderboard()),
+    ]);
+    return mergeEntries(remoteEntries, fileEntries, localEntries);
+  };
+
+  const flagUrlFromCode = (code) => {
+    const cc = String(code || "").trim();
+    if (cc.length !== 2) return "";
+    return `https://flagcdn.com/24x18/${cc.toLowerCase()}.png`;
   };
 
   const clearSelectionError = () => {
@@ -196,14 +316,9 @@
       .join("");
   };
 
-  const renderLeaderboardSafe = () => {
+  const renderLeaderboardSafe = async () => {
     if (!leaderboardList) return;
-    let entries = [];
-    try {
-      entries = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
-    } catch (e) {
-      entries = [];
-    }
+    const entries = await loadLeaderboard();
     leaderboardList.replaceChildren();
     if (!entries.length) {
       const empty = document.createElement("div");
@@ -224,9 +339,7 @@
       rank.textContent = `#${idx + 1}`;
       left.appendChild(rank);
 
-      const flagUrl = e.countryCode
-        ? `https://flagcdn.com/24x18/${String(e.countryCode).toLowerCase()}.png`
-        : "";
+      const flagUrl = flagUrlFromCode(e.countryCode);
       const flag = document.createElement("img");
       flag.className = "leaderboard-flag";
       if (flagUrl) {
@@ -327,13 +440,13 @@
   closeBtn?.addEventListener("click", closeOverlay);
   startButton.addEventListener("click", openOverlay);
 
-  leaderboardBtn?.addEventListener("click", (e) => {
+  leaderboardBtn?.addEventListener("click", async (e) => {
     e.preventDefault();
-    renderLeaderboardSafe();
+    await renderLeaderboardSafe();
     if (leaderboardModal) leaderboardModal.hidden = false;
   });
 
-    leaderboardClose?.addEventListener("click", () => {
-      if (leaderboardModal) leaderboardModal.hidden = true;
-    });
+  leaderboardClose?.addEventListener("click", () => {
+    if (leaderboardModal) leaderboardModal.hidden = true;
+  });
 })();
