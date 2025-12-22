@@ -43,12 +43,6 @@ function GameMenu() {
     document.body.classList.add("game-body");
     loadScriptsSequential(["/ressources/js/geo.js", "/ressources/js/script.js"])
       .then(() => {
-        if (location.state && location.state.autoOpen) {
-          const selectModal = document.getElementById("characterSelect");
-          if (selectModal) {
-            selectModal.hidden = false;
-          }
-        }
       })
       .catch((err) => console.error(err));
 
@@ -71,7 +65,7 @@ function GameMenu() {
 
       <div className="button-container">
         <button id="startGameBtn" type="button" className="btn">
-          Start Game
+          Start Game/Login
         </button>
         <button id="leaderboardBtn" type="button" className="btn secondary">
           Leaderboard
@@ -79,6 +73,72 @@ function GameMenu() {
         <Link to="/commands" className="btn secondary">
           Commands
         </Link>
+        <div className="account-bar account-under-buttons">
+          <div id="loginState" className="account-label">
+            Not logged in
+          </div>
+          <div className="account-actions">
+            <button id="logoutBtn" type="button" className="btn secondary">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Login Modal */}
+      <div id="loginModal" className="overlay" hidden>
+        <form id="loginForm" className="modal-box select">
+          <h1>Login</h1>
+          <p className="select-subtitle">
+            Sign in with a username and password. New users are created
+            automatically.
+          </p>
+
+          <div className="identity-block">
+            <label className="identity-label" htmlFor="loginUsername">
+              Username
+            </label>
+            <input
+              id="loginUsername"
+              name="loginUsername"
+              type="text"
+              inputMode="text"
+              autoComplete="username"
+              minLength="3"
+              maxLength="20"
+              pattern="^[A-Za-z0-9 _-]{3,20}$"
+              placeholder="Your name"
+              required
+            />
+          </div>
+
+          <div className="identity-block">
+            <label className="identity-label" htmlFor="loginPassword">
+              Password
+            </label>
+            <input
+              id="loginPassword"
+              name="loginPassword"
+              type="password"
+              autoComplete="current-password"
+              minLength="6"
+              maxLength="32"
+              placeholder="Password"
+              required
+            />
+          </div>
+
+          <div id="loginError" className="form-error" role="alert" hidden></div>
+
+          <div className="character-actions">
+            <button className="btn primary" type="submit">
+              Login
+            </button>
+            <button id="loginCancel" className="btn secondary" type="button">
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Character selection overlay */}
@@ -86,43 +146,8 @@ function GameMenu() {
         <form id="characterForm" className="modal-box select">
           <h1>Choose Your Character</h1>
           <p className="select-subtitle">
-            Pick a style, then drag &amp; drop it into the slot. Set your name
-            first.
+            Pick a style, then drag &amp; drop it into the slot.
           </p>
-
-          <div className="identity-block">
-            <label className="identity-label" htmlFor="playerName">
-              Username
-            </label>
-            <div className="identity-row">
-              <input
-                id="playerName"
-                name="playerName"
-                type="text"
-                inputMode="text"
-                autoComplete="nickname"
-                minLength="3"
-                maxLength="20"
-                pattern="^[A-Za-z0-9 _-]{3,20}$"
-                placeholder="Your name"
-                required
-              />
-              <img
-                id="geoFlag"
-                className="geo-flag"
-                hidden
-                width="24"
-                height="18"
-                alt="Country flag"
-                title="Country flag"
-              />
-            </div>
-            <div className="geo-row">
-              <div id="geoStatus" className="geo-status">
-                Detecting location...
-              </div>
-            </div>
-          </div>
 
           <div className="character-grid">
             <button

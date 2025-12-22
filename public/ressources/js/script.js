@@ -12,18 +12,24 @@
   const previewFrame = document.getElementById("characterPreviewFrame");
   const previewName = document.getElementById("characterPreviewName");
   const form = document.getElementById("characterForm");
-  const nameInput = document.getElementById("playerName");
-  const geoStatus = document.getElementById("geoStatus");
-  const geoFlag = document.getElementById("geoFlag");
-  const geoCountry = document.getElementById("geoCountry");
   const selectionError = document.getElementById("characterSelectionError");
   const leaderboardBtn = document.getElementById("leaderboardBtn");
   const leaderboardModal = document.getElementById("leaderboardModal");
   const leaderboardList = document.getElementById("leaderboardList");
   const leaderboardClose = document.getElementById("leaderboardClose");
+  const loginModal = document.getElementById("loginModal");
+  const loginForm = document.getElementById("loginForm");
+  const loginUsername = document.getElementById("loginUsername");
+  const loginPassword = document.getElementById("loginPassword");
+  const loginError = document.getElementById("loginError");
+  const loginCancel = document.getElementById("loginCancel");
+  const loginState = document.getElementById("loginState");
+  const logoutBtn = document.getElementById("logoutBtn");
 
   const STORAGE_KEY = "selectedCharacter";
   const USERNAME_KEY = "playerName";
+  const USERS_KEY = "authUsers";
+  const SESSION_KEY = "authSession";
   const LEADERBOARD_KEY = "leaderboard";
   const LEADERBOARD_URL = "/ressources/leaderboard.json";
   const FIREBASE_CONFIG = {
@@ -54,8 +60,9 @@
   if (!startButton || !overlay) return;
 
   let selected = null;
+  let currentUser = "";
 
-  const hasName = () => Boolean(nameInput?.value.trim());
+  const hasName = () => true;
 
   const getLabelFor = (id) => {
     const card = characterCards.find((c) => c.dataset.character === id);
@@ -67,6 +74,92 @@
   const sanitizeText = (val, fallback = "") => {
     if (typeof val !== "string") return fallback;
     return val.replace(/[<>]/g, "").trim() || fallback;
+  };
+
+  const hashPassword = (pwd) => {
+    const safe = typeof pwd === "string" ? pwd : "";
+    try {
+      return btoa(unescape(encodeURIComponent(safe)));
+    } catch (e) {
+      return safe;
+    }
+  };
+
+  const readUsers = () => {
+    try {
+      const raw = localStorage.getItem(USERS_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const writeUsers = (users) => {
+    try {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users || []));
+    } catch (e) {}
+  };
+
+  const setSessionUser = (username) => {
+    try {
+      localStorage.setItem(SESSION_KEY, username);
+      localStorage.setItem(USERNAME_KEY, username);
+    } catch (e) {}
+    currentUser = username;
+  };
+
+  const getSessionUser = () => {
+    try {
+      return localStorage.getItem(SESSION_KEY) || "";
+    } catch (e) {
+      return "";
+    }
+  };
+
+  const clearSessionUser = () => {
+    try {
+      localStorage.removeItem(SESSION_KEY);
+    } catch (e) {}
+    currentUser = "";
+  };
+
+  const authenticateUser = (username, password) => {
+    const name = sanitizeText(username, "");
+    const pass = typeof password === "string" ? password : "";
+    if (!name || pass.length < 6) {
+      throw new Error("Please provide username and password (min. 6 characters).");
+    }
+    const users = readUsers();
+    const hashed = hashPassword(pass);
+    const existing = users.find((u) => u?.username === name);
+    if (existing && existing.password !== hashed) {
+      throw new Error(
+        "This user already exists with a different password."
+      );
+    }
+    if (!existing) {
+      users.push({ username: name, password: hashed });
+      writeUsers(users);
+    }
+    setSessionUser(name);
+    return name;
+  };
+
+  const updateLoginState = () => {
+    const activeUser = currentUser || getSessionUser() || "";
+    if (activeUser && !currentUser) {
+      currentUser = activeUser;
+    }
+    if (loginState) {
+      loginState.textContent = activeUser
+        ? `Logged in as ${activeUser}`
+        : "Not logged in";
+    }
+    if (logoutBtn) {
+      logoutBtn.disabled = !activeUser;
+      logoutBtn.classList.toggle("disabled", !activeUser);
+    }
   };
 
   const sortLeaderboard = (a, b) => {
@@ -101,10 +194,15 @@
       ? existing.time
       : Infinity;
     const nextTime = Number.isFinite(next.time) ? next.time : Infinity;
-    return nextTime < existingTime ? next : existing;
+    if (nextTime !== existingTime) {
+      return nextTime < existingTime ? next : existing;
+    }
+    // If score/time are equal, prefer the newer entry (next) to refresh meta such as country.
+    return next;
   };
 
   const mergeEntries = (...entryLists) => {
+    // Later lists have higher priority (e.g., remote overrides local when tied).
     const bestByName = new Map();
     entryLists.flat().forEach((raw) => {
       const entry = normalizeEntry(raw);
@@ -155,7 +253,8 @@
       fetchLeaderboardFile(),
       Promise.resolve(readLocalLeaderboard()),
     ]);
-    return mergeEntries(remoteEntries, fileEntries, localEntries);
+    // Priority: remote > file > local (local last so it cannot override remote ties).
+    return mergeEntries(localEntries, fileEntries, remoteEntries);
   };
 
   const flagUrlFromCode = (code) => {
@@ -244,26 +343,48 @@
   };
 
   const openOverlay = (event) => {
-    event.preventDefault();
+    event?.preventDefault();
     overlay.hidden = false;
     form?.reset();
     selected = null;
-    if (nameInput) {
-      const storedName = localStorage.getItem(USERNAME_KEY) || "";
-      nameInput.value = storedName;
-    }
     clearSelectionError();
-    if (window.Geo?.initCountryFlag) {
-      window.Geo.initCountryFlag({
-        statusEl: geoStatus,
-        flagEl: geoFlag,
-        countryEl: geoCountry,
-      });
-    }
     highlightSelection();
     updateDropSelected();
     updatePreview();
     updateConfirmState();
+    updateLoginState();
+    if (window.Geo?.initCountryFlag) {
+      window.Geo.initCountryFlag().catch(() => {});
+    }
+  };
+
+  const clearLoginError = () => {
+    if (loginError) {
+      loginError.hidden = true;
+      loginError.textContent = "";
+    }
+  };
+
+  const showLoginError = (message) => {
+    if (!loginError) return;
+    loginError.hidden = !message;
+    loginError.textContent = message || "";
+  };
+
+  const openLoginModal = () => {
+    if (loginModal) {
+      loginModal.hidden = false;
+    }
+    loginForm?.reset();
+    clearLoginError();
+    loginUsername?.focus();
+  };
+
+  const closeLoginModal = () => {
+    if (loginModal) {
+      loginModal.hidden = true;
+    }
+    clearLoginError();
   };
 
   const closeOverlay = () => {
@@ -424,21 +545,31 @@
       dropSlot?.focus();
       return;
     }
-    const trimmedName = sanitizeText(nameInput?.value || "", "");
+    // Ensure a player name exists from the current session.
     try {
-      localStorage.setItem(USERNAME_KEY, trimmedName);
+      const activeUser = currentUser || getSessionUser();
+      if (activeUser) {
+        localStorage.setItem(USERNAME_KEY, activeUser);
+      } else if (!localStorage.getItem(USERNAME_KEY)) {
+        localStorage.setItem(USERNAME_KEY, "Player");
+      }
     } catch (e) {}
     localStorage.setItem(STORAGE_KEY, selected);
     window.location.href = "/play";
   });
 
-  nameInput?.addEventListener("input", () => {
-    clearSelectionError();
-    updateConfirmState();
-  });
-
   closeBtn?.addEventListener("click", closeOverlay);
-  startButton.addEventListener("click", openOverlay);
+  startButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    const activeUser = currentUser || getSessionUser();
+    if (activeUser) {
+      currentUser = activeUser;
+      updateLoginState();
+      openOverlay();
+    } else {
+      openLoginModal();
+    }
+  });
 
   leaderboardBtn?.addEventListener("click", async (e) => {
     e.preventDefault();
@@ -446,7 +577,34 @@
     if (leaderboardModal) leaderboardModal.hidden = false;
   });
 
+  loginForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    clearLoginError();
+    try {
+      const user = authenticateUser(
+        loginUsername?.value || "",
+        loginPassword?.value || ""
+      );
+      currentUser = user;
+      updateLoginState();
+      closeLoginModal();
+      openOverlay();
+    } catch (err) {
+      showLoginError(err?.message || "Login failed.");
+    }
+  });
+
+  loginCancel?.addEventListener("click", closeLoginModal);
+
+  logoutBtn?.addEventListener("click", () => {
+    clearSessionUser();
+    updateLoginState();
+  });
+
   leaderboardClose?.addEventListener("click", () => {
     if (leaderboardModal) leaderboardModal.hidden = true;
   });
+
+  // Init login state on load.
+  updateLoginState();
 })();

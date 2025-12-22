@@ -90,7 +90,9 @@ function betterEntry(next, current) {
   if (scoreNext !== scoreCur) return scoreNext > scoreCur ? next : current;
   const timeNext = Number.isFinite(next?.time) ? next.time : Infinity;
   const timeCur = Number.isFinite(current?.time) ? current.time : Infinity;
-  return timeNext < timeCur ? next : current;
+  if (timeNext !== timeCur) return timeNext < timeCur ? next : current;
+  // If score/time are equal, prefer the newer entry to refresh metadata (e.g., countryCode).
+  return next;
 }
 
 async function saveLeaderboardRemote(entry) {
@@ -129,9 +131,9 @@ function sortLeaderboard(a, b) {
 function saveLeaderboard(score){
   try{
     const time = Game.time;
-    const name = (localStorage.getItem('playerName') || 'Anonymous').trim() || 'Anonymous';
-    const locRaw = localStorage.getItem('playerLocation');
-    const countryCode = (localStorage.getItem(COUNTRY_KEY) || '').trim().toUpperCase();
+    const name = (localStorage.getItem("playerName") || "Anonymous").trim() || "Anonymous";
+    const locRaw = localStorage.getItem("playerLocation");
+    const countryCode = (localStorage.getItem(COUNTRY_KEY) || "").trim().toUpperCase();
     
     let location = null;
     if (locRaw) {
@@ -146,21 +148,22 @@ function saveLeaderboard(score){
 
       if (isNewBestScore || isBetterTimeWithSameScore){
         existing.score = score;
-        existing.time = time; // <-- Mise à jour du temps
-        existing.location = location ?? existing.location ?? null;
-        existing.countryCode = countryCode || existing.countryCode || '';
+        existing.time = time; // <-- update time
       }
+      // Always refresh location/country when available, even if score/time unchanged.
+      existing.location = location ?? existing.location ?? null;
+      existing.countryCode = countryCode || existing.countryCode || "";
     } else {
-    entries.push({ name, score, time, location, countryCode });
-  }
+      entries.push({ name, score, time, location, countryCode });
+    }
 
-  entries.sort(sortLeaderboard);
-  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
-  // Best effort remote save; non-blocking for gameplay.
-  saveLeaderboardRemote({ name, score, time, countryCode });
-} catch (err){
-  console.warn('Could not save leaderboard', err);
-}
+    entries.sort(sortLeaderboard);
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+    // Best effort remote save; non-blocking for gameplay.
+    saveLeaderboardRemote({ name, score, time, countryCode });
+  } catch (err){
+    console.warn("Could not save leaderboard", err);
+  }
 }
 
 // ------- Lifecycle Functions -------
@@ -194,3 +197,5 @@ function togglePause(force){
 document.getElementById('resumeBtn').onclick=()=>togglePause(false);
 document.getElementById('retryBtn').onclick=()=>{ location.href='/play'; };
 document.getElementById('winMenuBtn').onclick=()=>{ location.href='/game'; };
+
+
