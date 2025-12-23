@@ -5,9 +5,9 @@ class MovingPlatform extends Entity {
     this.baseY = y;
     this.rangeX = rangeX; // Distance de mouvement Horizontal
     this.rangeY = rangeY; // Distance de mouvement Vertical
-    this.speed = speed;   // Vitesse
+    this.speed = speed; // Vitesse
     this.timer = 0;
-    
+
     // Pour que le joueur sache de combien on a bougé ce tour-ci
     this.dx = 0;
     this.dy = 0;
@@ -31,9 +31,9 @@ class MovingPlatform extends Entity {
 
   draw() {
     const screenX = this.x - Game.camX;
-    ctx.fillStyle = "#9370DB"; // fallback color
+    ctx.fillStyle = "#db7070ff"; // fallback color
     ctx.fillRect(screenX, this.y, this.w, this.h);
-    ctx.strokeStyle = "#4B0082";
+    ctx.strokeStyle = "#820000ff";
     ctx.lineWidth = 2;
     ctx.strokeRect(screenX, this.y, this.w, this.h);
   }
