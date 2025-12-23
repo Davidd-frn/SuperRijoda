@@ -169,6 +169,10 @@ const LEVEL_REGISTRY = {
 const goalStarImg = new Image();
 goalStarImg.src = "/ressources/images/mockup/star.png";
 
+// --- Cloud Platform Image ---
+const cloudPlatformImg = new Image();
+cloudPlatformImg.src = "/ressources/images/mockup/cloud_platform.png";
+
 // --- GESTIONNAIRE DE NIVEAU ---
 const Level = {
   platforms: [],
