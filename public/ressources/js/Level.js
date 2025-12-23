@@ -177,9 +177,17 @@ cloudPlatformImg.src = "/ressources/images/mockup/cloud_platform.png";
 const oneWayPlatformImg = new Image();
 oneWayPlatformImg.src = "/ressources/images/mockup/dirt_plateform.png";
 
-oneWayPlatformImg.onload = () => console.log("✅ oneway loaded");
-oneWayPlatformImg.onerror = () =>
-  console.log("❌ oneway NOT found", oneWayPlatformImg.src);
+// --- Wall Platform Image (pattern) ---
+const wallPlatformImg = new Image();
+wallPlatformImg.src = "/ressources/images/mockup/wall.png";
+
+let wallPattern = null;
+wallPlatformImg.onload = () => {
+  wallPattern = ctx.createPattern(wallPlatformImg, "repeat");
+  console.log("✅ wall pattern ready");
+};
+wallPlatformImg.onerror = () =>
+  console.log("❌ wall NOT found", wallPlatformImg.src);
 
 // --- GESTIONNAIRE DE NIVEAU ---
 const Level = {
@@ -280,22 +288,36 @@ const Level = {
   },
 
   draw() {
-    // Plateformes
-    for (const p of this.platforms) {
-      const px = p.x - Game.camX;
+    ctx.save();
 
+    // 1️⃣ Appliquer la caméra une seule fois
+    ctx.translate(-Game.camX, 0);
+
+    // 2️⃣ Plateformes (coordonnées MONDE)
+    for (const p of this.platforms) {
+      // --- ONE WAY ---
       if (p.oneWay) {
         if (oneWayPlatformImg.complete && oneWayPlatformImg.naturalWidth) {
-          ctx.drawImage(oneWayPlatformImg, px, p.y, p.w, p.h);
+          ctx.drawImage(oneWayPlatformImg, p.x, p.y, p.w, p.h);
         } else {
           ctx.fillStyle = "#87CEFA";
-          ctx.fillRect(px, p.y, p.w, p.h);
+          ctx.fillRect(p.x, p.y, p.w, p.h);
         }
-      } else {
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(px, p.y, p.w, p.h);
+      }
+
+      // --- MURS (pattern figé) ---
+      else {
+        if (wallPattern) {
+          ctx.fillStyle = wallPattern;
+          ctx.fillRect(p.x, p.y, p.w, p.h);
+        } else {
+          ctx.fillStyle = "#000000";
+          ctx.fillRect(p.x, p.y, p.w, p.h);
+        }
       }
     }
+
+    ctx.restore();
 
     // Entités
     this.movingPlatforms.forEach((m) => m.draw());
