@@ -173,6 +173,14 @@ goalStarImg.src = "/ressources/images/mockup/star.png";
 const cloudPlatformImg = new Image();
 cloudPlatformImg.src = "/ressources/images/mockup/cloud_platform.png";
 
+// --- One Way Platform Image ---
+const oneWayPlatformImg = new Image();
+oneWayPlatformImg.src = "/ressources/images/mockup/dirt_plateform.png";
+
+oneWayPlatformImg.onload = () => console.log("✅ oneway loaded");
+oneWayPlatformImg.onerror = () =>
+  console.log("❌ oneway NOT found", oneWayPlatformImg.src);
+
 // --- GESTIONNAIRE DE NIVEAU ---
 const Level = {
   platforms: [],
@@ -275,8 +283,18 @@ const Level = {
     // Plateformes
     for (const p of this.platforms) {
       const px = p.x - Game.camX;
-      ctx.fillStyle = p.oneWay ? "#87CEFA" : "#000000";
-      ctx.fillRect(px, p.y, p.w, p.h);
+
+      if (p.oneWay) {
+        if (oneWayPlatformImg.complete && oneWayPlatformImg.naturalWidth) {
+          ctx.drawImage(oneWayPlatformImg, px, p.y, p.w, p.h);
+        } else {
+          ctx.fillStyle = "#87CEFA";
+          ctx.fillRect(px, p.y, p.w, p.h);
+        }
+      } else {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(px, p.y, p.w, p.h);
+      }
     }
 
     // Entités
