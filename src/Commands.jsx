@@ -29,14 +29,16 @@ function Commands() {
           </p>
 
           <div className="keys-grid">
-            <div className="key-card" data-key="ArrowLeft">
-              <div className="key-label">←</div>
+            {/* Move Left: ArrowLeft OR A (single card) */}
+            <div className="key-card" data-key="ArrowLeft" data-alt="KeyA">
+              <div className="key-label">← / A</div>
               <div className="key-name">Move Left</div>
               <p className="key-desc">Hold to run towards the left.</p>
             </div>
 
-            <div className="key-card" data-key="ArrowRight">
-              <div className="key-label">→</div>
+            {/* Move Right: ArrowRight OR D (single card) */}
+            <div className="key-card" data-key="ArrowRight" data-alt="KeyD">
+              <div className="key-label">→ / D</div>
               <div className="key-name">Move Right</div>
               <p className="key-desc">Hold to run towards the right.</p>
             </div>
@@ -49,8 +51,9 @@ function Commands() {
               </p>
             </div>
 
-            <div className="key-card" data-key="KeyA">
-              <div className="key-label">A</div>
+            {/* Attack moved to R */}
+            <div className="key-card" data-key="KeyR">
+              <div className="key-label">R</div>
               <div className="key-name">Attack</div>
               <p className="key-desc">Swing your katana to defeat enemies.</p>
             </div>
@@ -82,9 +85,9 @@ function Commands() {
           </div>
 
           <div className="commands-actions">
-            <Link 
-              to="/game" 
-              state={{ autoOpen: true }} 
+            <Link
+              to="/game"
+              state={{ autoOpen: true }}
               className="primary start-btn btn"
             >
               Select Character

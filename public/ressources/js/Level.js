@@ -151,7 +151,6 @@ const Level3Data = {
   ],
 
   checkpoints: [
-    { x: 670, y: 350 }, // Avant le grand mur
     { x: 1100, y: 30 }, // Au sommet, avant le gouffre final
   ],
 
