@@ -209,7 +209,8 @@ body.game-body {
 }
 
 #lives {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    sans-serif;
 }
 
 /* OVERLAYS & MODALES */
@@ -756,6 +757,7 @@ body.game-body {
   gap: 12px;
 }
 
+/* ===== ROW ===== */
 .leaderboard-row {
   display: flex;
   align-items: center;
@@ -765,35 +767,33 @@ body.game-body {
   border-radius: 8px;
   background: #fff;
   font-size: 13px;
-  transition: background-color 0.2s;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+  overflow: hidden; /* 🔑 empêche tout débordement */
+  gap: 12px;
 }
 
+/* Première place */
 .leaderboard-list .leaderboard-row:first-child {
-  background: #ffd700; /* OR Vif */
+  background: #ffd700;
   border-color: #ccaa00;
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
   font-weight: bold;
 }
 
+/* ===== LEFT SIDE ===== */
 .leaderboard-left {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.leaderboard-right {
-  display: flex;
-  align-items: center;
-  gap: 15px; /* Espacement score et temps */
+  flex: 1; /* prend l’espace dispo */
+  min-width: 0; /* 🔑 autorise le texte à se couper */
 }
 
 .leaderboard-rank {
   font-weight: bold;
   color: #b13c2f;
   width: 30px;
-  text-align: left;
-  margin-right: 5px;
+  flex-shrink: 0;
 }
 
 .leaderboard-flag {
@@ -802,27 +802,35 @@ body.game-body {
   object-fit: cover;
   border: 1px solid #000;
   border-radius: 4px;
-  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 .leaderboard-name {
   flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; /* … magique */
   text-align: left;
+}
+
+/* ===== RIGHT SIDE ===== */
+.leaderboard-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 0 0 auto; /* 🔑 ne rétrécit jamais */
+  white-space: nowrap; /* score + time toujours sur une ligne */
 }
 
 .leaderboard-score {
   font-weight: 700;
   color: #2ecc71;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
 .leaderboard-time {
   font-weight: 700;
-  color: #3498db; /* Bleu pour le temps */
-  width: 60px;
+  color: #3498db;
   text-align: right;
 }
 
