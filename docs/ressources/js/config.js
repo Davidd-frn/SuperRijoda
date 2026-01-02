@@ -34,32 +34,36 @@ const withBase = (p = "") => {
 const CHARACTER_LIBRARY = {
   samurai: {
     id: "samurai",
-    name: "Ronin", 
+    name: "Ronin",
     run: withBase("ressources/images/mockup/ronin.png"),
     attack: withBase("ressources/images/mockup/ronin.png"),
     filter: "none",
-    scale: 0.3, 
+    scale: 0.3,
     footAdjust: 14,
-    matchDefaultSize: true, 
+    matchDefaultSize: true,
 
-    // Configuration for running/jumping (Lines 1 and 2) 
+    // Configuration for running/jumping (Lines 1 and 2)
     sheetRunSpec: {
-        cols: 4, rows: 3, // The sheet is 4 columns and 3 rows
-        fw: null, fh: null, 
-        seq: {
-            idle: [0, 1, 2, 3],       
-            run: [4, 5, 6, 7],        
-            jump: [5]                 
-        }
+      cols: 4,
+      rows: 3, // The sheet is 4 columns and 3 rows
+      fw: null,
+      fh: null,
+      seq: {
+        idle: [0, 1, 2, 3],
+        run: [4, 5, 6, 7],
+        jump: [5],
+      },
     },
 
     // Configuration for attacking (Line 3)
     sheetAttackSpec: {
-        cols: 4, rows: 3,
-        fw: null, fh: null,
-        seq: {
-            attack: [8, 9, 10, 11]  
-        }
+      cols: 4,
+      rows: 3,
+      fw: null,
+      fh: null,
+      seq: {
+        attack: [8, 9, 10, 11],
+      },
     },
   },
   women: {
@@ -72,24 +76,26 @@ const CHARACTER_LIBRARY = {
     matchDefaultSize: true,
     footAdjust: 5,
     sheetRunSpec: {
-        cols: 4,
-        rows: 3,
-        fw: null, fh: null, // Let frame size auto-calc
-        seq: {
-            idle: [0],               // Single idle frame
-            run: [0, 1, 2, 3, 4, 5, 7], 
-            jump: [2]                // One jump frame
-        }
+      cols: 4,
+      rows: 3,
+      fw: null,
+      fh: null, // Let frame size auto-calc
+      seq: {
+        idle: [0], // Single idle frame
+        run: [0, 1, 2, 3, 4, 5, 7],
+        jump: [2], // One jump frame
+      },
     },
 
     // Configuration for attacking (Line 3)
     sheetAttackSpec: {
-        cols: 4,
-        rows: 3,
-        fw: null, fh: null,
-        seq: {
-            attack: [8, 9, 10, 11]   // The last row for attack
-        }
+      cols: 4,
+      rows: 3,
+      fw: null,
+      fh: null,
+      seq: {
+        attack: [8, 9, 10, 11], // The last row for attack
+      },
     },
   },
   shadow: {
@@ -102,25 +108,25 @@ const CHARACTER_LIBRARY = {
     matchDefaultSize: true, // force same on-screen size as default
     footAdjust: 14, // push sprite further down so feet touch ground
     // Use the same grid as default but let frame size auto-calc so only one frame shows at a time
-    sheetRunSpec: { 
-      cols: 4, 
-      rows: 3, 
-      fw: null, 
-      fh: null, 
-      seq: { 
-        idle: [8], 
-        run: [0, 1, 2, 3], 
-        jump: [6] 
-      } 
+    sheetRunSpec: {
+      cols: 4,
+      rows: 3,
+      fw: null,
+      fh: null,
+      seq: {
+        idle: [8],
+        run: [0, 1, 2, 3],
+        jump: [6],
+      },
     },
-    sheetAttackSpec: { 
-      cols: 4, 
-      rows: 3, 
-      fw: null, 
-      fh: null, 
-      seq: { 
-        attack: [4, 5, 6, 7] 
-      } 
+    sheetAttackSpec: {
+      cols: 4,
+      rows: 3,
+      fw: null,
+      fh: null,
+      seq: {
+        attack: [4, 5, 6, 7],
+      },
     },
   },
 };
@@ -152,13 +158,13 @@ const ASSETS = {
   bat: withBase("ressources/images/mockup/bat-enemy.png"),
   coins: withBase("ressources/images/mockup/Coin-Mockup.png"),
   shuriken: withBase("ressources/images/mockup/shuriken.png"),
-  // Audio 
+  // Audio
   bgm: withBase("ressources/audio/level_theme.mp3"),
   sfx_jump: withBase("ressources/audio/jump.wav"),
   sfx_coin: withBase("ressources/audio/coin.wav"),
   sfx_hit: withBase("ressources/audio/hit.wav"),
   sfx_damage: withBase("ressources/audio/damage.wav"),
-  sfx_throw: withBase("ressources/audio/shuriken_throw.wav"),
+  sfx_throw: withBase("ressources/audio/shuriken-throw.wav"),
   sfx_attack: withBase("ressources/audio/slash.mp3"),
 };
 
@@ -175,7 +181,7 @@ const SHEETS = {
   },
   playerAttack: {
     cols: 3,
-    rows: 3, 
+    rows: 3,
     scale: 0.55,
     fw: 682, // Width increased for the sword
     fh: 682,
@@ -190,11 +196,11 @@ const SHEETS = {
   bat: {
     cols: 4,
     rows: 3,
-    scale: 0.15, 
-    seq: { 
-        fly: [0, 1, 2, 3],       
-        attack: [4, 5, 6, 7],    
-        sleep: [8, 9, 10, 11]    
+    scale: 0.15,
+    seq: {
+      fly: [0, 1, 2, 3],
+      attack: [4, 5, 6, 7],
+      sleep: [8, 9, 10, 11],
     },
   },
   coin: {
@@ -204,10 +210,10 @@ const SHEETS = {
     seq: { spin: [0, 1, 2, 3, 4, 5, 6, 7] },
   },
   shuriken: {
-    cols: 1, 
+    cols: 1,
     rows: 1,
-    scale: 0.5, 
-    seq: { spin: [0] }, 
+    scale: 0.5,
+    seq: { spin: [0] },
   },
 };
 
