@@ -49,8 +49,8 @@ class Player extends Entity {
     const prevY = this.y;
 
     // ---- 1. INPUTS ----
-    const left = keys.has("ArrowLeft") || keys.has("KeyA");
-    const right = keys.has("ArrowRight") || keys.has("KeyD");
+    const left = keys.has("ArrowLeft");
+    const right = keys.has("ArrowRight");
     const moving = left || right;
 
     if (right) {
@@ -98,8 +98,8 @@ class Player extends Entity {
       playSFX(ASSETS.sfx_throw);
     }
 
-    // Start attack with 'R'
-    if (keys.has("KeyR") && !this.isAttacking && this.attackCooldown <= 0) {
+    // Start attack with 'A'
+    if (keys.has("KeyA") && !this.isAttacking && this.attackCooldown <= 0) {
       this.isAttacking = true;
       this.attackTimer = this.attackDuration;
       this.attackCooldown = 0.4; // Short delay before next attack
