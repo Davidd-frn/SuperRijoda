@@ -293,15 +293,10 @@
     }
   };
 
-  // Load and merge leaderboard entries from all sources.
+  // Load leaderboard entries from remote Firestore only.
   const loadLeaderboard = async () => {
-    const [remoteEntries, fileEntries, localEntries] = await Promise.all([
-      fetchLeaderboardRemote(),
-      fetchLeaderboardFile(),
-      Promise.resolve(readLocalLeaderboard()),
-    ]);
-    // Priority: remote > file > local (local last so it cannot override remote ties).
-    return mergeEntries(localEntries, fileEntries, remoteEntries);
+    const remoteEntries = await fetchLeaderboardRemote();
+    return mergeEntries(remoteEntries);
   };
 
   // Get flag image URL from country code.
