@@ -98,11 +98,15 @@ const FIREBASE_CONFIG = {
 let firebaseApi = null;
 async function getFirestoreApi() {
   if (firebaseApi) return firebaseApi;
-  const [{ initializeApp, getApps }, firestore, authModule] = await Promise.all([
-    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
-    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"),
-    import("https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"),
-  ]);
+  const [{ initializeApp, getApps }, firestore, authModule] = await Promise.all(
+    [
+      import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
+      import(
+        "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"
+      ),
+      import("https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"),
+    ]
+  );
   const app = getApps().length ? getApps()[0] : initializeApp(FIREBASE_CONFIG);
   const { getFirestore, collection, doc, getDoc, setDoc } = firestore;
   const { getAuth, signInAnonymously } = authModule;
