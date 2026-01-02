@@ -59,7 +59,9 @@
     if (firebaseApi) return firebaseApi;
     const [{ initializeApp }, firestore, authModule] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"),
+      import(
+        "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"
+      ),
       import("https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"),
     ]);
     const app = initializeApp(FIREBASE_CONFIG);
@@ -106,7 +108,6 @@
     return val.replace(/[<>]/g, "").trim() || fallback;
   };
 
-
   // Simple password "hashing" using base64 encoding.
   const hashPassword = (pwd) => {
     const safe = typeof pwd === "string" ? pwd : "";
@@ -116,7 +117,6 @@
       return safe;
     }
   };
-
 
   // Read the list of registered users from localStorage.
   const readUsers = () => {
@@ -129,14 +129,12 @@
     }
   };
 
-
   // Write the list of registered users to localStorage.
   const writeUsers = (users) => {
     try {
       localStorage.setItem(USERS_KEY, JSON.stringify(users || []));
     } catch (e) {}
   };
-
 
   // Set the current session user.
   const setSessionUser = (username) => {
@@ -147,7 +145,6 @@
     currentUser = username;
   };
 
-
   // Get the current session user.
   const getSessionUser = () => {
     try {
@@ -157,7 +154,6 @@
     }
   };
 
-
   // Clear the current session user.
   const clearSessionUser = () => {
     try {
@@ -166,21 +162,20 @@
     currentUser = "";
   };
 
-
   // Authenticate or register a user with username and password.
   const authenticateUser = (username, password) => {
     const name = sanitizeText(username, "");
     const pass = typeof password === "string" ? password : "";
     if (!name || pass.length < 6) {
-      throw new Error("Please provide username and password (min. 6 characters).");
+      throw new Error(
+        "Please provide username and password (min. 6 characters)."
+      );
     }
     const users = readUsers();
     const hashed = hashPassword(pass);
     const existing = users.find((u) => u?.username === name);
     if (existing && existing.password !== hashed) {
-      throw new Error(
-        "This user already exists with a different password."
-      );
+      throw new Error("This user already exists with a different password.");
     }
     if (!existing) {
       users.push({ username: name, password: hashed });
@@ -189,7 +184,6 @@
     setSessionUser(name);
     return name;
   };
-
 
   // Update the login state display and logout button.
   const updateLoginState = () => {
@@ -208,7 +202,6 @@
     }
   };
 
-
   // Sort leaderboard entries by score (desc) and time (asc).
   const sortLeaderboard = (a, b) => {
     const scoreA = Number(a?.score) || 0;
@@ -218,7 +211,6 @@
     const timeB = Number.isFinite(b?.time) ? b.time : Infinity;
     return timeA - timeB;
   };
-
 
   // Normalize a raw leaderboard entry.
   const normalizeEntry = (entry) => {
@@ -234,7 +226,6 @@
       countryCode,
     };
   };
-
 
   // Pick the best entry between two based on score and time.
   const pickBestEntry = (existing, next) => {
@@ -265,7 +256,6 @@
     return Array.from(bestByName.values()).sort(sortLeaderboard);
   };
 
-
   // Fetch leaderboard from static JSON file.
   const fetchLeaderboardFile = async () => {
     try {
@@ -277,7 +267,6 @@
     } catch (err) {}
     return [];
   };
-
 
   // Fetch leaderboard from remote Firestore database.
   const fetchLeaderboardRemote = async () => {
@@ -295,7 +284,6 @@
     }
   };
 
-
   // Read leaderboard from localStorage.
   const readLocalLeaderboard = () => {
     try {
@@ -304,7 +292,6 @@
       return [];
     }
   };
-
 
   // Load and merge leaderboard entries from all sources.
   const loadLeaderboard = async () => {
@@ -317,14 +304,12 @@
     return mergeEntries(localEntries, fileEntries, remoteEntries);
   };
 
-
   // Get flag image URL from country code.
   const flagUrlFromCode = (code) => {
     const cc = String(code || "").trim();
     if (cc.length !== 2) return "";
     return `https://flagcdn.com/24x18/${cc.toLowerCase()}.png`;
   };
-
 
   // Clear any selection error messages.
   const clearSelectionError = () => {
@@ -337,7 +322,6 @@
     }
   };
 
-
   // Show a selection error message.
   const showSelectionError = (message) => {
     if (selectionError) {
@@ -349,7 +333,6 @@
     }
   };
 
-
   // Update the confirm button state based on selection and name.
   const updateConfirmState = () => {
     const ready = Boolean(selected) && hasName();
@@ -358,7 +341,6 @@
       confirmBtn.classList.toggle("disabled", !ready);
     }
   };
-
 
   // Update the drop slot selected display.
   const updateDropSelected = () => {
@@ -371,7 +353,6 @@
     }
   };
 
-
   // Set the currently selected character.
   const setSelected = (id) => {
     if (!id) return;
@@ -382,7 +363,6 @@
     clearSelectionError();
     updateConfirmState();
   };
-
 
   // Update the character preview display.
   const updatePreview = () => {
@@ -407,7 +387,6 @@
     previewName.textContent = getLabelFor(selected);
     previewBox.hidden = false;
   };
-
 
   // Highlight the selected character card.
   const highlightSelection = () => {
@@ -569,7 +548,6 @@
     });
   }
 
-
   // Character card click selection.
   form?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -588,10 +566,8 @@
       }
     } catch (e) {}
     localStorage.setItem(STORAGE_KEY, selected);
-    // Use hash navigation so GitHub Pages doesn't need a server fallback.
-    window.location.href = `${BASE_URL}#/play`;
+    window.location.href = withBase("play");
   });
-
 
   // Event listeners for buttons and forms.
   closeBtn?.addEventListener("click", closeOverlay);
@@ -606,7 +582,6 @@
       openLoginModal();
     }
   });
-
 
   // Leaderboard button click.
   leaderboardBtn?.addEventListener("click", async (e) => {

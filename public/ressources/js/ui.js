@@ -1,6 +1,6 @@
 /* ===========================
-   SUPER RIJODA - UI & GAME STATE
-   =========================== */
+  SUPER RIJODA - UI & GAME STATE
+  =========================== */
 
 // ------- Game State -------
 const Game = {
@@ -271,8 +271,8 @@ function togglePause(force) {
 // UI hooks
 document.getElementById("resumeBtn").onclick = () => togglePause(false);
 document.getElementById("retryBtn").onclick = () => {
-  location.href = `${BASE_URL}#/play`;
+  location.href = "/SuperRijoda/play";
 };
 document.getElementById("winMenuBtn").onclick = () => {
-  location.href = `${BASE_URL}#/game`;
+  location.href = "/game";
 };
