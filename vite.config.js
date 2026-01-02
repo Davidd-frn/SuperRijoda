@@ -2,12 +2,15 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ command }) => {
+  const isDev = command === 'serve'
+  return {
+    plugins: [react()],
 
-  base: '/SuperRijoda/',
-  build: {
-    outDir: 'docs',
-  },
-
+    // Dev runs at root, build targets GitHub Pages under /game/
+    base: isDev ? '/' : '/game/',
+    build: {
+      outDir: 'docs',
+    },
+  }
 })
