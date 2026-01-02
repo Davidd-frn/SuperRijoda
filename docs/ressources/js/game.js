@@ -14,7 +14,7 @@ const bgFiles = [
 // Automatically load background images
 bgFiles.forEach((file) => {
   const img = new Image();
-  img.src = file;
+  img.src = withBase(file);
   bgImages.push(img);
 });
 

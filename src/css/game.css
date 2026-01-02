@@ -18,8 +18,8 @@
 body.game-body {
   margin: 0;
   height: 100vh;
-  background: url("/ressources/images/mockup/SuperRijodaMenu.png") center center /
-    100% 100% no-repeat;
+  background: center center / 100% 100% no-repeat;
+  background-image: var(--game-bg-url);
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;

@@ -31,7 +31,19 @@
   const USERS_KEY = "authUsers";
   const SESSION_KEY = "authSession";
   const LEADERBOARD_KEY = "leaderboard";
-  const LEADERBOARD_URL = "/ressources/leaderboard.json";
+  const normalizeBase = (b) => {
+    const val = typeof b === "string" && b.trim() ? b.trim() : "/";
+    const prefixed = val.startsWith("/") ? val : `/${val}`;
+    return prefixed.endsWith("/") ? prefixed : `${prefixed}/`;
+  };
+  const BASE_URL = normalizeBase(window.__BASE_URL__);
+  const withBase = (p = "") => {
+    if (!p) return BASE_URL;
+    if (/^https?:\/\//i.test(p)) return p;
+    const clean = p.startsWith("/") ? p.slice(1) : p;
+    return `${BASE_URL}${clean}`;
+  };
+  const LEADERBOARD_URL = withBase("ressources/leaderboard.json");
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyBHxxKPcTca5MKyBGw7KlGQpkv8gKZPd08",
     authDomain: "super-rijoda.firebaseapp.com",
@@ -576,7 +588,7 @@
       }
     } catch (e) {}
     localStorage.setItem(STORAGE_KEY, selected);
-    window.location.href = "/play";
+    window.location.href = withBase("play");
   });
 
 

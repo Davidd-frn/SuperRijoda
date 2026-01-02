@@ -3,10 +3,12 @@ import { useLocation } from "react-router-dom";
 import { Link, useNavigate } from "react-router-dom";
 import "./css/game.css";
 import { loadScriptsSequential, unloadScripts } from "./lib/loadScripts";
+import { setGameBackground, withBase } from "./lib/basePath";
 
 function GameMenu() {
   const navigate = useNavigate();
   const location = useLocation();
+  const menuScripts = ["ressources/js/geo.js", "ressources/js/script.js"];
 
   const stopAllAudio = () => {
     window.__stopGameLoop = true;
@@ -29,7 +31,7 @@ function GameMenu() {
       window.__bgmElement.pause();
       window.__bgmElement.currentTime = 0;
     }
-    unloadScripts(["/ressources/js/geo.js", "/ressources/js/script.js"]);
+    unloadScripts(menuScripts);
   };
 
   const handleBackHome = (e) => {
@@ -41,10 +43,8 @@ function GameMenu() {
   useEffect(() => {
     stopAllAudio();
     document.body.classList.add("game-body");
-    loadScriptsSequential(["/ressources/js/geo.js", "/ressources/js/script.js"])
-      .then(() => {
-      })
-      .catch((err) => console.error(err));
+    setGameBackground("ressources/images/mockup/SuperRijodaMenu.png");
+    loadScriptsSequential(menuScripts).catch((err) => console.error(err));
 
     return () => {
       document.body.classList.remove("game-body");
@@ -154,14 +154,14 @@ function GameMenu() {
               className="character-card"
               data-character="samurai"
               draggable="true"
-              data-preview="/ressources/images/mockup/RoninPicture.png"
+              data-preview={withBase("ressources/images/mockup/RoninPicture.png")}
               data-filter="none"
               data-cols="4"
               data-rows="3"
             >
               <div className="character-art">
                 <img
-                  src="/ressources/images/mockup/RoninPicture.png"
+                  src={withBase("ressources/images/mockup/RoninPicture.png")}
                   alt="Samurai preview"
                 />
                 <span className="swatch neutral"></span>
@@ -176,13 +176,13 @@ function GameMenu() {
               className="character-card"
               data-character="women"
               draggable="true"
-              data-preview="/ressources/images/mockup/Women.png"
+              data-preview={withBase("ressources/images/mockup/Women.png")}
               data-cols="4"
               data-rows="3"
             >
               <div className="character-art">
                 <img
-                  src="/ressources/images/mockup/Women.png"
+                  src={withBase("ressources/images/mockup/Women.png")}
                   alt="Women warrior preview"
                 />
                 <span className="swatch crimson"></span>
@@ -197,13 +197,13 @@ function GameMenu() {
               className="character-card"
               data-character="shadow"
               draggable="true"
-              data-preview="/ressources/images/mockup/ShadowShinobi.png"
+              data-preview={withBase("ressources/images/mockup/ShadowShinobi.png")}
               data-cols="4"
               data-rows="3"
             >
               <div className="character-art">
                 <img
-                  src="/ressources/images/mockup/ShadowShinobi.png"
+                  src={withBase("ressources/images/mockup/ShadowShinobi.png")}
                   alt="Shadow Shinobi preview"
                 />
                 <span className="swatch shadow"></span>

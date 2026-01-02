@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/game.css";
 import { loadScriptsSequential, unloadScripts } from "./lib/loadScripts";
+import { setGameBackground } from "./lib/basePath";
 
 const GAME_SCRIPTS = [
   "/ressources/js/config.js",
@@ -48,6 +49,7 @@ function GamePlay() {
     }
     window.__stopGameLoop = false;
     document.body.classList.add("game-body");
+    setGameBackground("ressources/images/mockup/SuperRijodaMenu.png");
     loadScriptsSequential(GAME_SCRIPTS, { forceReload: true }).catch((err) =>
       console.error(err)
     );

@@ -4,61 +4,74 @@
 
 // ------- Game State -------
 const Game = {
-  running:true, paused:false,
-  score:0, lives:3, time:0,
+  running: true,
+  paused: false,
+  score: 0,
+  lives: 3,
+  time: 0,
   particles: [],
-  gravity:0.6, friction:0.85,
-  worldW: 2000, worldH: 540, // Canvas Height
-  camX:0,
-  resetHUD(){ 
-    UI.score.textContent = this.score; 
+  gravity: 0.6,
+  friction: 0.85,
+  worldW: 2000,
+  worldH: 540, // Canvas Height
+  camX: 0,
+  resetHUD() {
+    UI.score.textContent = this.score;
     UI.time.textContent = this.time.toFixed(2);
     if (UI.level && typeof Level !== "undefined") {
-      const displayLevel = typeof Level.getDisplayLevel === "function"
-        ? Level.getDisplayLevel()
-        : (Level.currentId || 1);
+      const displayLevel =
+        typeof Level.getDisplayLevel === "function"
+          ? Level.getDisplayLevel()
+          : Level.currentId || 1;
       UI.level.textContent = displayLevel;
     }
-    const LIFE_ICON = '❤️';
-    UI.lives.textContent = LIFE_ICON.repeat(this.lives); 
+    const LIFE_ICON = "❤️";
+    UI.lives.textContent = LIFE_ICON.repeat(this.lives);
   },
 
   // AUDIO
   bgmElement: new Audio(ASSETS.bgm),
-  startBGM(){
+  startBGM() {
     window.__bgmElement = this.bgmElement;
     this.bgmElement.loop = true;
     this.bgmElement.volume = 0.3;
-    this.bgmElement.play().catch(e => console.log('BGM Autoplay blocked:', e));
+    this.bgmElement
+      .play()
+      .catch((e) => console.log("BGM Autoplay blocked:", e));
   },
-  stopBGM(){
+  stopBGM() {
     this.bgmElement.pause();
     this.bgmElement.currentTime = 0;
     if (window.__bgmElement) {
       window.__bgmElement.pause();
       window.__bgmElement.currentTime = 0;
     }
-  }
+  },
 };
 window.__bgmElement = Game.bgmElement;
 
 // ------- UI Elements -------
 const UI = {
-  score: document.getElementById('score'),
-  lives: document.getElementById('lives'),
-  time:  document.getElementById('time'),
-  level: document.getElementById('level'),
-  pause: document.getElementById('pauseOverlay'),
-  over:  document.getElementById('gameOver'),
-  win:   document.getElementById('winScreen'),
-  finalScore: document.getElementById('finalScore'),
-  winScore:   document.getElementById('winScore'),
-  show(el){el.hidden=false}, hide(el){el.hidden=true}
+  score: document.getElementById("score"),
+  lives: document.getElementById("lives"),
+  time: document.getElementById("time"),
+  level: document.getElementById("level"),
+  pause: document.getElementById("pauseOverlay"),
+  over: document.getElementById("gameOver"),
+  win: document.getElementById("winScreen"),
+  finalScore: document.getElementById("finalScore"),
+  winScore: document.getElementById("winScore"),
+  show(el) {
+    el.hidden = false;
+  },
+  hide(el) {
+    el.hidden = true;
+  },
 };
 
 // ------- Leaderboard storage -------
-const LEADERBOARD_KEY = 'leaderboard';
-const COUNTRY_KEY = 'playerCountryCode';
+const LEADERBOARD_KEY = "leaderboard";
+const COUNTRY_KEY = "playerCountryCode";
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBHxxKPcTca5MKyBGw7KlGQpkv8gKZPd08",
   authDomain: "super-rijoda.firebaseapp.com",
@@ -92,18 +105,20 @@ async function getFirestoreApi() {
   return firebaseApi;
 }
 
-
 // Merges two leaderboard entries, keeping the better score/time,
 // but refreshing metadata (name, countryCode) from the latest entry.
 function betterEntry(next, current) {
   if (!current) return next;
-  const scoreNext = next?.score ?? 0;
-  const scoreCur = current?.score ?? 0;
-  const timeNext = Number.isFinite(next?.time) ? next.time : Infinity;
-  const timeCur = Number.isFinite(current?.time) ? current.time : Infinity;
+  const scoreNext = Number(next?.score) || 0;
+  const scoreCur = Number(current?.score) || 0;
+  const timeNextRaw = Number(next?.time);
+  const timeCurRaw = Number(current?.time);
+  const timeNext = Number.isFinite(timeNextRaw) ? timeNextRaw : Infinity;
+  const timeCur = Number.isFinite(timeCurRaw) ? timeCurRaw : Infinity;
 
   const betterScore = scoreNext > scoreCur;
-  const betterTimeWithSameScore = scoreNext === scoreCur && timeNext < timeCur;
+  const sameScore = scoreNext === scoreCur;
+  const betterTimeWithSameScore = sameScore && timeNext < timeCur;
   const keepCurrent = !betterScore && !betterTimeWithSameScore;
 
   // Always refresh metadata (e.g., countryCode) from the latest submission.
@@ -118,9 +133,12 @@ function betterEntry(next, current) {
   }
 
   // Take the better performance, but keep refreshed meta.
-  return { ...next, ...mergedMeta };
+  return {
+    ...mergedMeta,
+    score: scoreNext,
+    time: Number.isFinite(timeNext) ? timeNext : null,
+  };
 }
-
 
 // Saves leaderboard entry remotely to Firestore (best-effort; non-blocking).
 async function saveLeaderboardRemote(entry) {
@@ -152,43 +170,57 @@ async function saveLeaderboardRemote(entry) {
   }
 }
 
-
 // Sorting function for leaderboard entries
 function sortLeaderboard(a, b) {
-    const scoreA = a.score || 0;
-    const scoreB = b.score || 0;
-    const timeA = a.time || Infinity;
-    const timeB = b.time || Infinity;
+  const scoreA = a.score || 0;
+  const scoreB = b.score || 0;
+  const timeA = a.time || Infinity;
+  const timeB = b.time || Infinity;
 
-    // Sort 1: By Score 
-    if (scoreA !== scoreB) {
-        return scoreB - scoreA;
-    }
-    // Sort 2: By Time (ascending)
-    return timeA - timeB;
+  // Sort 1: By Score
+  if (scoreA !== scoreB) {
+    return scoreB - scoreA;
+  }
+  // Sort 2: By Time (ascending)
+  return timeA - timeB;
 }
 
-
 // Saves leaderboard entry locally and remotely
-function saveLeaderboard(score){
-  try{
+function saveLeaderboard(score) {
+  try {
     const time = Game.time;
-    const name = (localStorage.getItem("playerName") || "Anonymous").trim() || "Anonymous";
+    const name =
+      (localStorage.getItem("playerName") || "Anonymous").trim() || "Anonymous";
     const locRaw = localStorage.getItem("playerLocation");
-    const countryCode = (localStorage.getItem(COUNTRY_KEY) || "").trim().toUpperCase();
-    
+    const countryCode = (localStorage.getItem(COUNTRY_KEY) || "")
+      .trim()
+      .toUpperCase();
+
     let location = null;
     if (locRaw) {
-      try { location = JSON.parse(locRaw); } catch(e){ location = locRaw; }
+      try {
+        location = JSON.parse(locRaw);
+      } catch (e) {
+        location = locRaw;
+      }
     }
     let entries = [];
-    try{ entries = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || []; }catch(e){ entries = []; }
-    const existing = entries.find(e => e && e.name === name);
-    if (existing){
-      const isNewBestScore = score > (existing.score ?? 0);
-      const isBetterTimeWithSameScore = score === (existing.score ?? 0) && time < (existing.time ?? Infinity);
+    try {
+      entries = JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
+    } catch (e) {
+      entries = [];
+    }
+    const existing = entries.find((e) => e && e.name === name);
+    if (existing) {
+      const existingScore = Number(existing.score) || 0;
+      const existingTime = Number.isFinite(Number(existing.time))
+        ? Number(existing.time)
+        : Infinity;
+      const isNewBestScore = score > existingScore;
+      const isBetterTimeWithSameScore =
+        score === existingScore && time < existingTime;
 
-      if (isNewBestScore || isBetterTimeWithSameScore){
+      if (isNewBestScore || isBetterTimeWithSameScore) {
         existing.score = score;
         existing.time = time; // <-- update time
       }
@@ -203,16 +235,16 @@ function saveLeaderboard(score){
     localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
     // Best effort remote save; non-blocking for gameplay.
     saveLeaderboardRemote({ name, score, time, countryCode });
-  } catch (err){
+  } catch (err) {
     console.warn("Could not save leaderboard", err);
   }
 }
 
 // ------- Lifecycle Functions -------
-function end(win){
+function end(win) {
   Game.running = false;
   Game.stopBGM();
-  
+
   // Format final time to 5 decimal places
   const finalTime = Game.time.toFixed(5);
   saveLeaderboard(Game.score);
@@ -229,16 +261,18 @@ function end(win){
 }
 
 // Toggles pause state
-function togglePause(force){
+function togglePause(force) {
   Game.paused = force ?? !Game.paused;
   UI.pause.hidden = !Game.paused;
-  if(Game.paused) Game.bgmElement.pause();
-  else Game.bgmElement.play().catch(e => console.log('BGM error:', e));
+  if (Game.paused) Game.bgmElement.pause();
+  else Game.bgmElement.play().catch((e) => console.log("BGM error:", e));
 }
 
 // UI hooks
-document.getElementById('resumeBtn').onclick=()=>togglePause(false);
-document.getElementById('retryBtn').onclick=()=>{ location.href='/play'; };
-document.getElementById('winMenuBtn').onclick=()=>{ location.href='/game'; };
-
-
+document.getElementById("resumeBtn").onclick = () => togglePause(false);
+document.getElementById("retryBtn").onclick = () => {
+  location.href = "/SuperRijoda/play";
+};
+document.getElementById("winMenuBtn").onclick = () => {
+  location.href = "/game";
+};

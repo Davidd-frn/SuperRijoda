@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./css/game.css";
 import { loadScriptsSequential } from "./lib/loadScripts";
+import { setGameBackground } from "./lib/basePath";
 
 function Commands() {
   useEffect(() => {
     document.body.classList.add("game-body");
+    setGameBackground("ressources/images/mockup/SuperRijodaMenu.png");
     loadScriptsSequential(["/ressources/js/commands.js"]).catch((err) =>
       console.error(err)
     );

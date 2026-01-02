@@ -5,13 +5,26 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+const normalizeBase = (b) => {
+  const val = typeof b === "string" && b.trim() ? b.trim() : "/";
+  const prefixed = val.startsWith("/") ? val : `/${val}`;
+  return prefixed.endsWith("/") ? prefixed : `${prefixed}/`;
+};
+const BASE_URL = normalizeBase(window.__BASE_URL__);
+const withBase = (p = "") => {
+  if (!p) return BASE_URL;
+  if (/^https?:\/\//i.test(p)) return p;
+  const clean = p.startsWith("/") ? p.slice(1) : p;
+  return `${BASE_URL}${clean}`;
+};
+
 // ------- Character library & selection -------
 const CHARACTER_LIBRARY = {
   samurai: {
     id: "samurai",
     name: "Ronin", 
-    run: "/ressources/images/mockup/ronin.png",
-    attack: "/ressources/images/mockup/ronin.png",
+    run: withBase("ressources/images/mockup/ronin.png"),
+    attack: withBase("ressources/images/mockup/ronin.png"),
     filter: "none",
     scale: 0.3, 
     footAdjust: 14,
@@ -40,8 +53,8 @@ const CHARACTER_LIBRARY = {
   women: {
     id: "women",
     name: "Women Warrior",
-    run: "/ressources/images/mockup/womenPlayer.png",
-    attack: "/ressources/images/mockup/womenPlayer.png",
+    run: withBase("ressources/images/mockup/womenPlayer.png"),
+    attack: withBase("ressources/images/mockup/womenPlayer.png"),
     filter: "none",
     scale: 0.18,
     matchDefaultSize: true,
@@ -70,8 +83,8 @@ const CHARACTER_LIBRARY = {
   shadow: {
     id: "shadow",
     name: "Shadow Shinobi",
-    run: "/ressources/images/mockup/ninja-sheet.png",
-    attack: "/ressources/images/mockup/ninja-sheet.png",
+    run: withBase("ressources/images/mockup/ninja-sheet.png"),
+    attack: withBase("ressources/images/mockup/ninja-sheet.png"),
     filter: "none",
     scale: 0.18,
     matchDefaultSize: true, // force same on-screen size as default
@@ -123,18 +136,18 @@ const PLAYER_SKIN =
 const ASSETS = {
   playerAttack: PLAYER_SKIN.attack,
   playerRun: PLAYER_SKIN.run,
-  enemy: "/ressources/images/mockup/enemies.png",
-  bat: "/ressources/images/mockup/bat-enemy.png",
-  coins: "/ressources/images/mockup/Coin-Mockup.png",
-  shuriken: "ressources/images/mockup/shuriken.png",
+  enemy: withBase("ressources/images/mockup/enemies.png"),
+  bat: withBase("ressources/images/mockup/bat-enemy.png"),
+  coins: withBase("ressources/images/mockup/Coin-Mockup.png"),
+  shuriken: withBase("ressources/images/mockup/shuriken.png"),
   // Audio 
-  bgm: "/ressources/audio/level_theme.mp3",
-  sfx_jump: "/ressources/audio/jump.wav",
-  sfx_coin: "/ressources/audio/coin.wav",
-  sfx_hit: "/ressources/audio/hit.wav",
-  sfx_damage: "/ressources/audio/damage.wav",
-  sfx_throw: "/ressources/audio/shuriken_throw.wav",
-  sfx_attack: "/ressources/audio/slash.mp3",
+  bgm: withBase("ressources/audio/level_theme.mp3"),
+  sfx_jump: withBase("ressources/audio/jump.wav"),
+  sfx_coin: withBase("ressources/audio/coin.wav"),
+  sfx_hit: withBase("ressources/audio/hit.wav"),
+  sfx_damage: withBase("ressources/audio/damage.wav"),
+  sfx_throw: withBase("ressources/audio/shuriken_throw.wav"),
+  sfx_attack: withBase("ressources/audio/slash.mp3"),
 };
 
 // ------- Sprite sheets -------

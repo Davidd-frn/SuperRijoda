@@ -162,19 +162,19 @@ const LEVEL_REGISTRY = {
 
 // --- ASSETS ---
 const goalStarImg = new Image();
-goalStarImg.src = "/ressources/images/mockup/star.png";
+goalStarImg.src = withBase("ressources/images/mockup/star.png");
 
 // --- Cloud Platform Image ---
 const cloudPlatformImg = new Image();
-cloudPlatformImg.src = "/ressources/images/mockup/cloud_platform.png";
+cloudPlatformImg.src = withBase("ressources/images/mockup/cloud_platform.png");
 
 // --- One Way Platform Image ---
 const oneWayPlatformImg = new Image();
-oneWayPlatformImg.src = "/ressources/images/mockup/dirt_plateform.png";
+oneWayPlatformImg.src = withBase("ressources/images/mockup/dirt_plateform.png");
 
 // --- Wall Platform Image (pattern) ---
 const wallPlatformImg = new Image();
-wallPlatformImg.src = "/ressources/images/mockup/wall.png";
+wallPlatformImg.src = withBase("ressources/images/mockup/wall.png");
 
 let wallPattern = null;
 wallPlatformImg.onload = () => {
