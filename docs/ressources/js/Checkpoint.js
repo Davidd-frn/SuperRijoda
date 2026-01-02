@@ -1,15 +1,15 @@
 class Checkpoint extends Entity {
   constructor(x, y) {
-    super(x, y, 40, 60); // Taille de la lanterne
-    this.active = false; // Par défaut, éteinte
+    super(x, y, 40, 60); // Size of the checkpoint
+    this.active = false; // By default, the checkpoint is inactive
     this.timer = 0;
   }
 
   update(dt) {
-    // Animation simple (flottement)
+    // Simple animation
     this.timer += dt * 2;
 
-    // Si le joueur touche la lanterne
+    // If the player touches the checkpoint and it's not active yet
     if (!this.active && AABB(this.rect(), player.rect())) {
       this.activate();
     }
@@ -18,40 +18,40 @@ class Checkpoint extends Entity {
   activate() {
     this.active = true;
     
-    // On dit au Niveau : "C'est le nouveau point de départ !"
+    // We toll the level to set the respawn point here
     Level.setRespawn(this.x, this.y);
     
-    // Petit effet sonore (on réutilise le son de pièce pour l'instant)
+    // Small sound effect to indicate activation
     playSFX(ASSETS.sfx_coin); 
   }
 
   draw() {
     const screenX = this.x - Game.camX;
     
-    // 1. Le Poteau (Bois foncé)
+    // 1. The Pole
     ctx.fillStyle = "#5d4037";
     ctx.fillRect(screenX + 15, this.y + 20, 10, 40);
 
-    // 2. La Lanterne (Change de couleur si active)
+    // 2. The Lantern
     if (this.active) {
-        // ALLUMÉE : Rouge vif + Lueur jaune
+        // State ON : Red bright glowing
         ctx.fillStyle = "#ff3d00"; 
         ctx.shadowBlur = 20;
         ctx.shadowColor = "gold";
     } else {
-        // ÉTEINTE : Rouge sombre terne
+        // State OFF : Dark brown
         ctx.fillStyle = "#3e2723";
         ctx.shadowBlur = 0;
     }
 
-    // Dessin de la lanterne (Rectangle arrondi)
+    // Lantern body
     ctx.fillRect(screenX, this.y, 40, 30);
     
-    // Détail jaune (le caractère chinois ou la lumière intérieure)
+    // Decorative light
     ctx.fillStyle = this.active ? "#ffea00" : "#5d4037";
     ctx.fillRect(screenX + 10, this.y + 5, 20, 20);
 
-    // Reset des effets d'ombre pour ne pas gâcher le reste du jeu
+    // Reset shadow
     ctx.shadowBlur = 0;
   }
 }

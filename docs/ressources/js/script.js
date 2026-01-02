@@ -88,11 +88,14 @@
     );
   };
 
+  // Sanitize text by removing angle brackets and trimming whitespace.
   const sanitizeText = (val, fallback = "") => {
     if (typeof val !== "string") return fallback;
     return val.replace(/[<>]/g, "").trim() || fallback;
   };
 
+
+  // Simple password "hashing" using base64 encoding.
   const hashPassword = (pwd) => {
     const safe = typeof pwd === "string" ? pwd : "";
     try {
@@ -102,6 +105,8 @@
     }
   };
 
+
+  // Read the list of registered users from localStorage.
   const readUsers = () => {
     try {
       const raw = localStorage.getItem(USERS_KEY);
@@ -112,12 +117,16 @@
     }
   };
 
+
+  // Write the list of registered users to localStorage.
   const writeUsers = (users) => {
     try {
       localStorage.setItem(USERS_KEY, JSON.stringify(users || []));
     } catch (e) {}
   };
 
+
+  // Set the current session user.
   const setSessionUser = (username) => {
     try {
       localStorage.setItem(SESSION_KEY, username);
@@ -126,6 +135,8 @@
     currentUser = username;
   };
 
+
+  // Get the current session user.
   const getSessionUser = () => {
     try {
       return localStorage.getItem(SESSION_KEY) || "";
@@ -134,6 +145,8 @@
     }
   };
 
+
+  // Clear the current session user.
   const clearSessionUser = () => {
     try {
       localStorage.removeItem(SESSION_KEY);
@@ -141,6 +154,8 @@
     currentUser = "";
   };
 
+
+  // Authenticate or register a user with username and password.
   const authenticateUser = (username, password) => {
     const name = sanitizeText(username, "");
     const pass = typeof password === "string" ? password : "";
@@ -163,6 +178,8 @@
     return name;
   };
 
+
+  // Update the login state display and logout button.
   const updateLoginState = () => {
     const activeUser = currentUser || getSessionUser() || "";
     if (activeUser && !currentUser) {
@@ -179,6 +196,8 @@
     }
   };
 
+
+  // Sort leaderboard entries by score (desc) and time (asc).
   const sortLeaderboard = (a, b) => {
     const scoreA = Number(a?.score) || 0;
     const scoreB = Number(b?.score) || 0;
@@ -188,6 +207,8 @@
     return timeA - timeB;
   };
 
+
+  // Normalize a raw leaderboard entry.
   const normalizeEntry = (entry) => {
     if (!entry || typeof entry !== "object") return null;
     const name = sanitizeText(entry.name, "Anonymous");
@@ -202,6 +223,8 @@
     };
   };
 
+
+  // Pick the best entry between two based on score and time.
   const pickBestEntry = (existing, next) => {
     if (!existing) return next;
     if (next.score !== existing.score) {
@@ -230,6 +253,8 @@
     return Array.from(bestByName.values()).sort(sortLeaderboard);
   };
 
+
+  // Fetch leaderboard from static JSON file.
   const fetchLeaderboardFile = async () => {
     try {
       const res = await fetch(LEADERBOARD_URL, { cache: "no-store" });
@@ -241,6 +266,8 @@
     return [];
   };
 
+
+  // Fetch leaderboard from remote Firestore database.
   const fetchLeaderboardRemote = async () => {
     try {
       const { db, collection, getDocs, query, orderBy, limit } =
@@ -256,6 +283,8 @@
     }
   };
 
+
+  // Read leaderboard from localStorage.
   const readLocalLeaderboard = () => {
     try {
       return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
@@ -264,6 +293,8 @@
     }
   };
 
+
+  // Load and merge leaderboard entries from all sources.
   const loadLeaderboard = async () => {
     const [remoteEntries, fileEntries, localEntries] = await Promise.all([
       fetchLeaderboardRemote(),
@@ -274,12 +305,16 @@
     return mergeEntries(localEntries, fileEntries, remoteEntries);
   };
 
+
+  // Get flag image URL from country code.
   const flagUrlFromCode = (code) => {
     const cc = String(code || "").trim();
     if (cc.length !== 2) return "";
     return `https://flagcdn.com/24x18/${cc.toLowerCase()}.png`;
   };
 
+
+  // Clear any selection error messages.
   const clearSelectionError = () => {
     if (selectionError) {
       selectionError.hidden = true;
@@ -290,6 +325,8 @@
     }
   };
 
+
+  // Show a selection error message.
   const showSelectionError = (message) => {
     if (selectionError) {
       selectionError.hidden = false;
@@ -300,6 +337,8 @@
     }
   };
 
+
+  // Update the confirm button state based on selection and name.
   const updateConfirmState = () => {
     const ready = Boolean(selected) && hasName();
     if (confirmBtn) {
@@ -308,6 +347,8 @@
     }
   };
 
+
+  // Update the drop slot selected display.
   const updateDropSelected = () => {
     if (!dropSelected || !dropSlot) return;
     if (selected) {
@@ -318,6 +359,8 @@
     }
   };
 
+
+  // Set the currently selected character.
   const setSelected = (id) => {
     if (!id) return;
     selected = id;
@@ -328,6 +371,8 @@
     updateConfirmState();
   };
 
+
+  // Update the character preview display.
   const updatePreview = () => {
     if (!previewBox || !previewFrame || !previewName) return;
     if (!selected) {
@@ -351,6 +396,8 @@
     previewBox.hidden = false;
   };
 
+
+  // Highlight the selected character card.
   const highlightSelection = () => {
     characterCards.forEach((card) => {
       const isActive = card.dataset.character === selected;
@@ -408,52 +455,7 @@
     overlay.hidden = true;
   };
 
-  const renderLeaderboard = () => {
-    if (!leaderboardList) return;
-    let entries = [];
-    try {
-      entries = JSON.parse(localStorage.getItem("leaderboard")) || [];
-    } catch (e) {
-      entries = [];
-    }
-    if (!entries.length) {
-      leaderboardList.innerHTML =
-        '<div class="leaderboard-empty">No scores yet.</div>';
-      return;
-    }
-    leaderboardList.innerHTML = entries
-      .slice(0, 10)
-      .map(
-        (e, idx) => {
-        // Formatage du temps : s il existe, formater à 2 décimales. Sinon, afficher --
-          const timeDisplay = e.time ? `${e.time.toFixed(3)}s` : "--";
-          // Construction de l'URL du drapeau à partir du countryCode (plus fiable que l'emoji)
-          const flagUrl = e.countryCode 
-            ? `https://flagcdn.com/24x18/${e.countryCode.toLowerCase()}.png` 
-            : "";
-            
-          return `
-            <div class="leaderboard-row">
-              <div class="leaderboard-left">
-                <span class="leaderboard-rank">#${idx + 1}</span>
-                <img 
-                  class="leaderboard-flag" 
-                  src="${flagUrl}" 
-                  alt="${e.countryCode || ""}" 
-                  ${flagUrl ? "" : "hidden"} 
-                />
-                <span class="leaderboard-name">${e.name || "Anonymous"}</span>
-              </div>
-              <div class="leaderboard-right">
-                <span class="leaderboard-score">${e.score ?? 0} pts</span>
-                <span class="leaderboard-time">${timeDisplay}</span>
-              </div>
-            </div>`;
-        }
-      )
-      .join("");
-  };
-
+  // Render the leaderboard entries safely.
   const renderLeaderboardSafe = async () => {
     if (!leaderboardList) return;
     const entries = await loadLeaderboard();
@@ -555,6 +557,8 @@
     });
   }
 
+
+  // Character card click selection.
   form?.addEventListener("submit", (e) => {
     e.preventDefault();
     if (!selected) {
@@ -575,6 +579,8 @@
     window.location.href = "/play";
   });
 
+
+  // Event listeners for buttons and forms.
   closeBtn?.addEventListener("click", closeOverlay);
   startButton.addEventListener("click", (e) => {
     e.preventDefault();
@@ -588,6 +594,8 @@
     }
   });
 
+
+  // Leaderboard button click.
   leaderboardBtn?.addEventListener("click", async (e) => {
     e.preventDefault();
     await renderLeaderboardSafe();

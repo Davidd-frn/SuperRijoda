@@ -92,6 +92,9 @@ async function getFirestoreApi() {
   return firebaseApi;
 }
 
+
+// Merges two leaderboard entries, keeping the better score/time,
+// but refreshing metadata (name, countryCode) from the latest entry.
 function betterEntry(next, current) {
   if (!current) return next;
   const scoreNext = next?.score ?? 0;
@@ -118,6 +121,8 @@ function betterEntry(next, current) {
   return { ...next, ...mergedMeta };
 }
 
+
+// Saves leaderboard entry remotely to Firestore (best-effort; non-blocking).
 async function saveLeaderboardRemote(entry) {
   try {
     const { db, collection, doc, getDoc, setDoc } = await getFirestoreApi();
@@ -147,20 +152,24 @@ async function saveLeaderboardRemote(entry) {
   }
 }
 
+
+// Sorting function for leaderboard entries
 function sortLeaderboard(a, b) {
     const scoreA = a.score || 0;
     const scoreB = b.score || 0;
     const timeA = a.time || Infinity;
     const timeB = b.time || Infinity;
 
-    // Tri 1: Par Score (descendant)
+    // Sort 1: By Score 
     if (scoreA !== scoreB) {
         return scoreB - scoreA;
     }
-    // Tri 2: Si scores égaux, par Temps (ascendant)
+    // Sort 2: By Time (ascending)
     return timeA - timeB;
 }
 
+
+// Saves leaderboard entry locally and remotely
 function saveLeaderboard(score){
   try{
     const time = Game.time;
@@ -204,21 +213,22 @@ function end(win){
   Game.running = false;
   Game.stopBGM();
   
-  // On formate le temps final proprement
+  // Format final time to 5 decimal places
   const finalTime = Game.time.toFixed(5);
   saveLeaderboard(Game.score);
 
   if (win) {
-    // Affichage Victoire : Score Total + Temps Total
+    // Victory Display: Score + Time
     UI.winScore.textContent = `${Game.score} pts | ${finalTime}s`;
     UI.show(UI.win);
   } else {
-    // Affichage Défaite : Score accumulé jusqu'à la mort
+    // Defeat Display: Score only
     UI.finalScore.textContent = `${Game.score} pts`;
     UI.show(UI.over);
   }
 }
 
+// Toggles pause state
 function togglePause(force){
   Game.paused = force ?? !Game.paused;
   UI.pause.hidden = !Game.paused;

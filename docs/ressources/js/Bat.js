@@ -1,15 +1,15 @@
 class Bat extends Entity {
   constructor(x, y, dist = 100) {
-    super(x, y, 48, 48); // Taille de la hitbox
+    super(x, y, 48, 48); // Size of the bat
     this.sheet = new Sheet(ASSETS.bat, SHEETS.bat);
     
-    this.startX = x;      // Centre de sa zone de patrouille
-    this.baseY = y;       // Hauteur de base
-    this.dist = dist;     // Distance de vol (gauche/droite)
-    this.timer = 0;       // Pour le mouvement fluide
+    this.startX = x;      // Center the horizontal movement
+    this.baseY = y;       // Height base for vertical movement
+    this.dist = dist;     // Distance of horizontal movement
+    this.timer = 0;       // For movement timing
     this.dead = false;
     
-    // Direction pour l'affichage (1 ou -1)
+    // Direction the bat is facing: 1 for right, -1 for left
     this.facing = 1; 
   }
 
@@ -18,33 +18,33 @@ class Bat extends Entity {
 
     this.timer += dt;
 
-    // --- MOUVEMENT DE VOL ---
-    // 1. Mouvement Horizontal (Aller-retour fluide avec Sinus)
-    // On utilise Math.sin pour faire un mouvement doux de gauche à droite
+    // --- MOVEMENT ---
+    // 1. Horizontal Movement (Smooth back-and-forth with Sinus)
+    // We use Math.sin to create a smooth left-to-right movement
     const offsetX = Math.sin(this.timer * 2) * this.dist;
     
-    // Détection de la direction pour retourner l'image
-    // Si la nouvelle position est à droite de l'ancienne, on regarde à droite
+    // Detection of direction change for sprite facing
+    // If the new position is greater than the current, it's moving right
     const newX = this.startX + offsetX;
-    if (newX > this.x) this.facing = 1; // Ajustez selon le sens de votre sprite
+    if (newX > this.x) this.facing = 1; // Ajust the facing direction
     else this.facing = -1;
     
     this.x = newX;
 
-    // 2. Mouvement Vertical (Petit flottement haut/bas)
-    // Ajoute un effet de vol réaliste
+    // 2. Vertical Movement
+    // Add a vertical oscillation to simulate flying
     this.y = this.baseY + Math.sin(this.timer * 5) * 15;
 
-    // --- COLLISIONS AVEC LE JOUEUR ---
+    // --- Collisions with the player ---
     if (AABB(this.rect(), player.rect())) {
-        // Logique de dégâts identique à l'ennemi normal
+        // Logic to determine if the player hits the bat from above
         const fromTop = player.dy > 0 && player.y + player.h - this.y < 24;
 
         if (fromTop) {
             this.dead = true;
-            player.dy = -8; // Rebond
+            player.dy = -8; // Rebounce the player upwards
             playSFX(ASSETS.sfx_hit);
-            Game.score += 100; // Plus de points pour une chauve-souris !
+            Game.score += 100; // More points for defeating an enemy
             Game.resetHUD();
         } else if (player.invul <= 0) {
             Game.lives--;
@@ -65,7 +65,7 @@ class Bat extends Entity {
 
     const screenX = this.x - Game.camX;
     
-    // Gestion du miroir (flip)
+    // Mirror the sprite based on facing direction
     ctx.save();
     ctx.translate(screenX + this.w / 2, this.y + this.h / 2);
     ctx.scale(this.facing, 1); 

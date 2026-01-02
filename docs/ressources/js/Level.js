@@ -2,16 +2,16 @@
    SUPER RIJODA - LEVEL MANAGER
    =========================== */
 
-// --- DONNÉES DU NIVEAU 1 (Intro) ---
+// --- Data for Level 1 (Intro) ---
 const Level1Data = {
   id: 1,
-  background: "#FFFFFF", // Fond blanc comme sur le mockup
+  background: "#FFFFFF", 
   platforms: [
-    { x: 0, y: 400, w: 200, h: 140 }, // Départ
-    { x: 300, y: 450, w: 150, h: 90 }, // Île milieu
-    { x: 550, y: 350, w: 150, h: 190 }, // Île haute
-    { x: 720, y: 300, w: 100, h: 20 }, // Flottante
-    { x: 850, y: 400, w: 110, h: 140 }, // Fin
+    { x: 0, y: 400, w: 200, h: 140 }, // Start
+    { x: 300, y: 450, w: 150, h: 90 }, 
+    { x: 550, y: 350, w: 150, h: 190 }, 
+    { x: 720, y: 300, w: 100, h: 20 }, 
+    { x: 850, y: 400, w: 110, h: 140 }, 
   ],
   coins: [
     { x: 360, y: 410 },
@@ -24,37 +24,35 @@ const Level1Data = {
   goal: { x: 900, y: 350, w: 40, h: 40 },
 };
 
-// --- DONNÉES DU NIVEAU 2 (Verticalité + Ressorts) ---
+// --- Data for Level 2 (Verticality + Springs) ---
 const Level2Data = {
   id: 2,
   background: "#FFFFFF",
   platforms: [
-    // Sol de départ (Noir - Solide)
+    // Depart 
     { x: 0, y: 450, w: 200, h: 90 },
 
-    // LES ESCALIERS BLEUS (Transparents -> oneWay: true)
+    // The first ascension (One Way Platforms)
     { x: 100, y: 350, w: 80, h: 20, oneWay: true },
     { x: 200, y: 280, w: 80, h: 20, oneWay: true },
     { x: 200, y: 200, w: 80, h: 20, oneWay: true },
 
-    // Plateforme Haute (Noire - Solide)
+    // High Platform
     { x: 300, y: 150, w: 200, h: 40 },
 
-    // Descente Bleue
+    // The descent (One Way Platforms)
     { x: 550, y: 220, w: 80, h: 20, oneWay: true },
     { x: 650, y: 300, w: 80, h: 20, oneWay: true },
 
-    // Île Bas Droite (Avant le trou)
+    // The lower platform
     { x: 750, y: 450, w: 150, h: 90 },
 
-    // Île de Fin
+    // The final ascension
     { x: 950, y: 250, w: 100, h: 290 },
   ],
 
-  // NOUVEAU : Plateformes mobiles
+  // Mobile Platforms
   movingPlatforms: [
-    // x, y, w, h, rangeX, rangeY, speed
-    // Ici elle est à x=900, elle bouge de 0 en X et de 150 en Y (Haut/Bas)
     { x: 880, y: 320, w: 60, h: 20, rangeX: 0, rangeY: 90, speed: 2 },
   ],
 
@@ -68,44 +66,42 @@ const Level2Data = {
   ],
   goal: { x: 970, y: 200, w: 40, h: 40 },
 
-  // On supprime les ressorts (springs) car remplacés par la plateforme mobile
+  // We delete spikes and springs for this level
   springs: [],
 };
 
-// --- DONNÉES DU NIVEAU 3 (Hardcore & Long) ---
+// --- Data for Level 3  ---
 const Level3Data = {
   id: 3,
   background: "#FFFFFF",
 
-  // 1. LES PLATEFORMES (Structure)
+  // 1. The platforms (Precision, Endurance, Timing)
   platforms: [
-    // --- ZONE 1 : LE CHAMP DE PIQUES (Précision) ---
-    { x: 0, y: 450, w: 150, h: 190 }, // Départ plus haut
+    { x: 0, y: 450, w: 150, h: 190 }, 
 
-    // Piliers plus étroits que dans votre version précédente = plus dur
+    // Step 1 : The Pillars (Precision) 
     { x: 200, y: 350, w: 50, h: 190 },
     { x: 350, y: 300, w: 50, h: 240 },
     { x: 500, y: 350, w: 50, h: 190 },
 
-    // --- ZONE 2 : LE MUR VERTICAL (Endurance) ---
-    { x: 650, y: 400, w: 150, h: 140 }, // Base du mur
+    // Step 2 : The Wall (Endurance)
+    { x: 650, y: 400, w: 150, h: 140 },
 
-    // Ascension en zigzag avec des oneWay
+    // Ascension with One Way Platforms
     { x: 800, y: 300, w: 80, h: 20, oneWay: true },
     { x: 650, y: 200, w: 80, h: 20, oneWay: true },
     { x: 800, y: 100, w: 80, h: 20, oneWay: true },
 
-    // Le Sommet (très haut)
+    // The summit platform
     { x: 950, y: 80, w: 300, h: 40 },
 
-    // --- ZONE 3 : LE GOUFFRE FINAL (Timing) ---
-    // Juste une petite plateforme d'arrivée très loin
+    // Step 3 : The Final Chasm (Timing)
+    // Just a little platform before the gap
     { x: 2200, y: 250, w: 150, h: 40 },
   ],
 
-  // 2. LES DANGERS (Piques partout)
+  // 2. The Spikes (Filling the gaps)
   spikes: [
-    // Zone 1 : Remplir les trous entre les piliers
     { x: 150, y: 510 },
     { x: 180, y: 510 },
     { x: 250, y: 510 },
@@ -119,23 +115,23 @@ const Level3Data = {
     { x: 610, y: 510 },
   ],
 
-  // 3. LES PLATEFORMES MOBILES (Rapides et dangereuses)
+  // 3. Mobile Platforms (Fast and Dangerous)
   movingPlatforms: [
-    // Pour traverser le gouffre final. Elles sont plus rapides maintenant (speed 2.5 et 3)
-    { x: 1300, y: 150, w: 80, h: 20, rangeX: 150, rangeY: 50, speed: 2.5 }, // Mouvement diagonal !
-    { x: 1650, y: 250, w: 80, h: 20, rangeX: 0, rangeY: 120, speed: 3.0 }, // Ascenseur rapide
-    { x: 1900, y: 200, w: 80, h: 20, rangeX: 150, rangeY: 0, speed: 2.5 }, // Dernier saut horizontal
+    // These platforms move in various patterns to challenge the player
+    { x: 1300, y: 150, w: 80, h: 20, rangeX: 150, rangeY: 50, speed: 2.5 }, // Diagonal movement
+    { x: 1650, y: 250, w: 80, h: 20, rangeX: 0, rangeY: 120, speed: 3.0 }, // Fast vertical
+    { x: 1900, y: 200, w: 80, h: 20, rangeX: 150, rangeY: 0, speed: 2.5 }, // Last horizontal jump
   ],
 
-  // 4. LES ENNEMIS (Placés stratégiquement)
+  // 4. The Enemies (Placed strategically)
   enemies: [
-    // Sur le pilier du milieu (très gênant pour sauter)
+    // On the first pillar
     { x: 375, y: 150, type: "patrol", dist: 20 },
 
-    // Pendant l'escalade du mur
+    // During the wall climb
     { x: 810, y: 60, type: "patrol", dist: 60 },
 
-    // Au sommet, pour vous accueillir après l'escalade
+    // At the summit, to welcome you after the climb
     { x: 1000, y: 40, type: "patrol", dist: 150 },
 
     { x: 1450, y: 100, type: "bat", dist: 120 },
@@ -144,14 +140,14 @@ const Level3Data = {
   ],
 
   coins: [
-    { x: 375, y: 220 }, // Au dessus de l'ennemi du pilier (risque/récompense)
-    { x: 690, y: 160 }, // Pendant l'escalade
-    { x: 1340, y: 110 }, // Sur la 1ère plateforme mobile
-    { x: 1940, y: 160 }, // Sur la dernière plateforme mobile
+    { x: 375, y: 220 }, // On top of the first pillar
+    { x: 690, y: 160 }, // During the wall climb
+    { x: 1340, y: 110 }, // On the first moving platform
+    { x: 1940, y: 160 }, // On the last moving platform
   ],
 
   checkpoints: [
-    { x: 1100, y: 30 }, // Au sommet, avant le gouffre final
+    { x: 1100, y: 30 }, // At the summit, before the final chasm
   ],
 
   goal: { x: 2250, y: 200, w: 40, h: 40 },
@@ -188,7 +184,7 @@ wallPlatformImg.onload = () => {
 wallPlatformImg.onerror = () =>
   console.log("❌ wall NOT found", wallPlatformImg.src);
 
-// --- GESTIONNAIRE DE NIVEAU ---
+// Gestion of the current level
 const Level = {
   platforms: [],
   movingPlatforms: [],
@@ -204,17 +200,17 @@ const Level = {
   bgColor: "#e3a576",
   loopCount: 0, // number of completed full cycles for endless mode
 
-  // Charge un niveau depuis les données (Data)
+  // Load level data
   init(data) {
     this.currentId = data.id;
 
     this.respawnX = 60;
     this.respawnY = 90;
 
-    // Charge les plateformes classiques
+    // Load platforms
     this.platforms = data.platforms;
 
-    // Charge les plateformes mobiles (Nouveau)
+    // Load other entities
     this.movingPlatforms = (data.movingPlatforms || []).map(
       (m) => new MovingPlatform(m.x, m.y, m.w, m.h, m.rangeX, m.rangeY, m.speed)
     );
@@ -232,6 +228,8 @@ const Level = {
       en.speed *= difficulty;
       return en;
     });
+
+    // Scale moving platforms speed with difficulty
     this.movingPlatforms.forEach((m) => {
       m.speed *= difficulty;
     });
@@ -250,27 +248,30 @@ const Level = {
 
     this.projectiles = [];
 
-    // Reset Joueur
+    // Reset player position
     player.x = this.respawnX;
     player.y = this.respawnY;
     player.dx = 0;
     player.dy = 0;
   },
 
+  // Get the display level number (accounting for loops)
   getDisplayLevel() {
     const total = Object.keys(LEVEL_REGISTRY).length || 1;
     return this.currentId + (this.loopCount || 0) * total;
   },
 
+  // Set new respawn point
   setRespawn(x, y) {
     this.respawnX = x;
-    this.respawnY = y; // On garde la hauteur de la lanterne (ou un peu au-dessus)
+    this.respawnY = y; // Would be adjusted to stand on ground
     console.log("Checkpoint activated !");
   },
 
   update(dt) {
     this.coins.forEach((c) => c.update(dt));
     this.enemies.forEach((e) => e.update(dt, this));
+    // Update projectiles and remove dead ones
     if (this.projectiles) {
       for (let i = this.projectiles.length - 1; i >= 0; i--) {
         const p = this.projectiles[i];
@@ -286,13 +287,14 @@ const Level = {
     this.checkpoints.forEach((c) => c.update(dt));
   },
 
+  // Draw level elements
   draw() {
     ctx.save();
 
-    // 1️⃣ Appliquer la caméra une seule fois
+    // 1. Background
     ctx.translate(-Game.camX, 0);
 
-    // 2️⃣ Plateformes (coordonnées MONDE)
+    // 2. Platforms
     for (const p of this.platforms) {
       // --- ONE WAY ---
       if (p.oneWay) {
@@ -304,7 +306,7 @@ const Level = {
         }
       }
 
-      // --- MURS (pattern figé) ---
+      // Wall platforms (vertical)
       else {
         if (wallPattern) {
           ctx.fillStyle = wallPattern;
@@ -318,7 +320,7 @@ const Level = {
 
     ctx.restore();
 
-    // Entités
+    // Entities
     this.movingPlatforms.forEach((m) => m.draw());
     this.coins.forEach((c) => c.draw());
     this.projectiles.forEach((p) => p.draw());
@@ -327,19 +329,19 @@ const Level = {
     this.springs.forEach((s) => s.draw());
     this.checkpoints.forEach((c) => c.draw());
 
-    // Objectif (Étoile jaune)
+    // Goal(star)
     if (this.goal) {
       const gx = this.goal.x - Game.camX;
       if (goalStarImg.complete && goalStarImg.naturalWidth) {
         ctx.drawImage(goalStarImg, gx, this.goal.y, this.goal.w, this.goal.h);
       } else {
-        ctx.fillStyle = "#f2c14e"; // fallback jaune
+        ctx.fillStyle = "#f2c14e";
         ctx.fillRect(gx, this.goal.y, this.goal.w, this.goal.h);
       }
     }
   },
 
-  // Passage au niveau suivant
+  // Navigate to the next level
   next() {
     const entries = Object.entries(LEVEL_REGISTRY).sort(
       ([a], [b]) => Number(a) - Number(b)
@@ -352,7 +354,7 @@ const Level = {
       this.init(nextEntry[1]);
       return;
     }
-    // Boucle infinie : on revient au premier niveau et on augmente la difficultÃ©
+    // Infinite mode : loop back to level 1 with increased difficulty
     this.loopCount += 1;
     const firstEntry = entries[0];
     if (firstEntry) {

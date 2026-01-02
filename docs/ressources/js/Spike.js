@@ -1,22 +1,21 @@
 class Spike extends Entity {
   constructor(x, y) {
-    // 64x32 correspond à la taille standard d'une rangée de piques
+    // 64x32 pixels is the size of the spike
     super(x, y, 64, 32);
-    // Vous pourrez ajouter une image plus tard dans config.js si vous voulez
     this.image = ASSETS.spike || null; 
   }
 
   update(dt) {
-    // Si le joueur touche les piques
+    // If the player collides with the spike
     if (AABB(this.rect(), player.rect())) {
-      // On vérifie que le joueur n'est pas déjà clignotant (invulnérable)
+      // Verify if the player is not invulnerable
       if (player.invul <= 0) {
         Game.lives--;
-        player.invul = 60; // Rend invulnérable pendant ~1 seconde
-        player.dy = -8;    // Petit bond en arrière (recul)
+        player.invul = 60; // Invulnerability frames
+        player.dy = -8;    // Small backward jump (recoil)
         playSFX(ASSETS.sfx_damage);
-        
-        // Si plus de vie, Game Over
+
+        // If no more lives, Game Over
         if (Game.lives <= 0) end(false);
       }
     }
@@ -28,15 +27,15 @@ class Spike extends Entity {
     if (this.image) {
       ctx.drawImage(this.image, screenX, this.y, this.w, this.h);
     } else {
-      // DESSIN TEMPORAIRE (Dents grises)
-      ctx.fillStyle = "#888"; // Gris
+      // Temporary spike drawing
+      ctx.fillStyle = "#888"; 
       ctx.beginPath();
-      // On dessine 3 petits triangles
+      // Draw 3 spikes
       const w3 = this.w / 3;
       for(let i=0; i<3; i++) {
-        ctx.moveTo(screenX + i*w3, this.y + this.h);      // Bas gauche
-        ctx.lineTo(screenX + i*w3 + w3/2, this.y);        // Sommet
-        ctx.lineTo(screenX + (i+1)*w3, this.y + this.h);  // Bas droite
+        ctx.moveTo(screenX + i*w3, this.y + this.h);      
+        ctx.lineTo(screenX + i*w3 + w3/2, this.y);        
+        ctx.lineTo(screenX + (i+1)*w3, this.y + this.h);  
       }
       ctx.fill();
     }
