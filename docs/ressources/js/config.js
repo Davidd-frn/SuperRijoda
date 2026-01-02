@@ -2,8 +2,20 @@
    SUPER RIJODA - CONFIG
    =========================== */
 
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+let canvas = null;
+let ctx = null;
+const bindGameCanvas = () => {
+  const el = document.getElementById("game");
+  if (!el) {
+    console.warn("Game canvas not found.");
+    return false;
+  }
+  canvas = el;
+  ctx = canvas.getContext("2d");
+  return true;
+};
+bindGameCanvas();
+window.bindGameCanvas = bindGameCanvas;
 
 const normalizeBase = (b) => {
   const val = typeof b === "string" && b.trim() ? b.trim() : "/";

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/game.css";
-import { loadScriptsSequential, unloadScripts } from "./lib/loadScripts";
+import { loadScriptsSequential } from "./lib/loadScripts";
 import { setGameBackground } from "./lib/basePath";
 
 const GAME_SCRIPTS = [
@@ -39,7 +39,6 @@ function GamePlay() {
     document.body.classList.remove("game-body");
     stopGameAudio();
     window.__stopGameLoop = true;
-    unloadScripts(GAME_SCRIPTS);
   };
 
   useEffect(() => {
@@ -50,9 +49,13 @@ function GamePlay() {
     window.__stopGameLoop = false;
     document.body.classList.add("game-body");
     setGameBackground("ressources/images/mockup/SuperRijodaMenu.png");
-    loadScriptsSequential(GAME_SCRIPTS, { forceReload: true }).catch((err) =>
-      console.error(err)
-    );
+    loadScriptsSequential(GAME_SCRIPTS)
+      .then(() => {
+        if (typeof window.startGame === "function") {
+          window.startGame();
+        }
+      })
+      .catch((err) => console.error(err));
     return () => {
       cleanup();
     };

@@ -18,22 +18,6 @@ function App() {
     location.pathname.startsWith(path)
   );
 
-  const GAME_SCRIPTS = [
-    "/ressources/js/config.js",
-    "/ressources/js/ui.js",
-    "/ressources/js/Entity.js",
-    "/ressources/js/MovingPlatform.js",
-    "/ressources/js/Particle.js",
-    "/ressources/js/Checkpoint.js",
-    "/ressources/js/Player.js",
-    "/ressources/js/Enemy.js",
-    "/ressources/js/Bat.js",
-    "/ressources/js/Spike.js",
-    "/ressources/js/Spring.js",
-    "/ressources/js/Level.js",
-    "/ressources/js/game.js",
-  ];
-
   const MENU_SCRIPTS = ["/ressources/js/geo.js", "/ressources/js/script.js"];
   const COMMAND_SCRIPTS = ["/ressources/js/commands.js"];
 
@@ -53,7 +37,6 @@ function App() {
             window.Game.bgmElement.pause();
             window.Game.bgmElement.currentTime = 0;
           }
-          window.Game = undefined;
         } catch (e) {
           // ignore cleanup errors
         }
@@ -66,7 +49,7 @@ function App() {
           // ignore
         }
       }
-      unloadScripts([...GAME_SCRIPTS, ...MENU_SCRIPTS, ...COMMAND_SCRIPTS]);
+      unloadScripts([...MENU_SCRIPTS, ...COMMAND_SCRIPTS]);
     }
   }, [location.pathname]);
 

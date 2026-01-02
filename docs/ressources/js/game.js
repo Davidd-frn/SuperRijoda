@@ -120,23 +120,62 @@ function loop(t) {
 
 
 // --- START GAME ---
+function startGame() {
+  window.__stopGameLoop = false;
 
-// 1. We load the level data
-if (typeof Level1Data !== "undefined") {
-  Level.init(Level1Data);
-} else {
-  console.error(
-    "Error: Level1Data not found. Check the order of scripts in the HTML."
-  );
+  if (typeof window.bindGameCanvas === "function") {
+    if (!window.bindGameCanvas()) {
+      return;
+    }
+  }
+  if (typeof window.bindGameUI === "function") {
+    window.bindGameUI();
+  }
+
+  if (typeof Game !== "undefined") {
+    Game.running = true;
+    Game.paused = false;
+    Game.score = 0;
+    Game.lives = 3;
+    Game.time = 0;
+    Game.particles = [];
+    Game.camX = 0;
+    if (typeof Game.stopBGM === "function") {
+      Game.stopBGM();
+    }
+  }
+
+  currentLevelIndex = 0;
+  if (typeof Level !== "undefined") {
+    Level.loopCount = 0;
+  }
+
+  if (typeof Level1Data !== "undefined") {
+    Level.init(Level1Data);
+  } else {
+    console.error(
+      "Error: Level1Data not found. Check the order of scripts in the HTML."
+    );
+  }
+
+  if (typeof UI !== "undefined") {
+    UI.hide?.(UI.pause);
+    UI.hide?.(UI.over);
+    UI.hide?.(UI.win);
+  }
+
+  if (typeof Game !== "undefined" && typeof Game.resetHUD === "function") {
+    Game.resetHUD();
+  }
+  if (typeof Game !== "undefined" && typeof Game.startBGM === "function") {
+    Game.startBGM();
+  }
+
+  last = 0;
+  requestAnimationFrame(loop);
 }
 
-// 2.We reset the in-game HUD
-Game.resetHUD();
-
-// 3. Start the background music
-Game.startBGM();
-
-requestAnimationFrame(loop);
+window.startGame = startGame;
 
 function advanceLevel() {
   Level.next(); // Load the next level

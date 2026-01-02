@@ -49,18 +49,30 @@ const Game = {
   },
 };
 window.__bgmElement = Game.bgmElement;
+window.Game = Game;
 
 // ------- UI Elements -------
 const UI = {
-  score: document.getElementById("score"),
-  lives: document.getElementById("lives"),
-  time: document.getElementById("time"),
-  level: document.getElementById("level"),
-  pause: document.getElementById("pauseOverlay"),
-  over: document.getElementById("gameOver"),
-  win: document.getElementById("winScreen"),
-  finalScore: document.getElementById("finalScore"),
-  winScore: document.getElementById("winScore"),
+  score: null,
+  lives: null,
+  time: null,
+  level: null,
+  pause: null,
+  over: null,
+  win: null,
+  finalScore: null,
+  winScore: null,
+  bind() {
+    this.score = document.getElementById("score");
+    this.lives = document.getElementById("lives");
+    this.time = document.getElementById("time");
+    this.level = document.getElementById("level");
+    this.pause = document.getElementById("pauseOverlay");
+    this.over = document.getElementById("gameOver");
+    this.win = document.getElementById("winScreen");
+    this.finalScore = document.getElementById("finalScore");
+    this.winScore = document.getElementById("winScore");
+  },
   show(el) {
     el.hidden = false;
   },
@@ -68,6 +80,7 @@ const UI = {
     el.hidden = true;
   },
 };
+UI.bind();
 
 // ------- Leaderboard storage -------
 const LEADERBOARD_KEY = "leaderboard";
@@ -268,11 +281,31 @@ function togglePause(force) {
   else Game.bgmElement.play().catch((e) => console.log("BGM error:", e));
 }
 
-// UI hooks
-document.getElementById("resumeBtn").onclick = () => togglePause(false);
-document.getElementById("retryBtn").onclick = () => {
-  location.href = "/SuperRijoda/play";
+const resolveHref = (path) =>
+  typeof withBase === "function" ? withBase(path) : path;
+
+const bindGameUI = () => {
+  UI.bind();
+
+  const resumeBtn = document.getElementById("resumeBtn");
+  if (resumeBtn) resumeBtn.onclick = () => togglePause(false);
+
+  const retryBtn = document.getElementById("retryBtn");
+  if (retryBtn)
+    retryBtn.onclick = () => {
+      if (typeof window.startGame === "function") {
+        window.startGame();
+        return;
+      }
+      window.location.href = resolveHref("#/play");
+    };
+
+  const winMenuBtn = document.getElementById("winMenuBtn");
+  if (winMenuBtn)
+    winMenuBtn.onclick = () => {
+      window.location.href = resolveHref("#/game");
+    };
 };
-document.getElementById("winMenuBtn").onclick = () => {
-  location.href = "/game";
-};
+
+window.bindGameUI = bindGameUI;
+bindGameUI();
