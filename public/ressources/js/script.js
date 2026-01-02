@@ -271,11 +271,11 @@
   // Fetch leaderboard from remote Firestore database.
   const fetchLeaderboardRemote = async () => {
     try {
-      const { db, collection, getDocs, query, orderBy, limit } =
+      const { db, collection, getDocs, query, orderBy } =
         await getFirestoreApi();
       const colRef = collection(db, "leaderboard");
-      // Best effort: order by score, fetch a handful, final sort happens client-side.
-      const q = query(colRef, orderBy("score", "desc"), limit(50));
+      // Best effort: order by score; final sort happens client-side.
+      const q = query(colRef, orderBy("score", "desc"));
       const snap = await getDocs(q);
       return snap.docs.map((d) => d.data());
     } catch (err) {
@@ -458,7 +458,7 @@
       leaderboardList.appendChild(empty);
       return;
     }
-    entries.slice(0, 10).forEach((e, idx) => {
+    entries.forEach((e, idx) => {
       const row = document.createElement("div");
       row.className = "leaderboard-row";
 
