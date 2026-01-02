@@ -98,12 +98,12 @@ const FIREBASE_CONFIG = {
 let firebaseApi = null;
 async function getFirestoreApi() {
   if (firebaseApi) return firebaseApi;
-  const [{ initializeApp }, firestore, authModule] = await Promise.all([
+  const [{ initializeApp, getApps }, firestore, authModule] = await Promise.all([
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"),
     import("https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"),
   ]);
-  const app = initializeApp(FIREBASE_CONFIG);
+  const app = getApps().length ? getApps()[0] : initializeApp(FIREBASE_CONFIG);
   const { getFirestore, collection, doc, getDoc, setDoc } = firestore;
   const { getAuth, signInAnonymously } = authModule;
   const db = getFirestore(app);
@@ -168,14 +168,15 @@ async function saveLeaderboardRemote(entry) {
     const current = snap.exists() ? snap.data() : null;
     const best = betterEntry(entry, current);
     // Only send fields allowed by Firestore rules.
+    const normalizedCountry =
+      typeof best?.countryCode === "string" && best.countryCode.length === 2
+        ? best.countryCode.toUpperCase()
+        : null;
     const payload = {
       name: String(best?.name || "Anonymous").slice(0, 50),
       score: Number(best?.score) || 0,
       time: Number.isFinite(best?.time) ? best.time : null,
-      countryCode:
-        typeof best?.countryCode === "string" && best.countryCode.length === 2
-          ? best.countryCode.toUpperCase()
-          : "",
+      countryCode: normalizedCountry,
     };
     await setDoc(docRef, payload);
   } catch (err) {
