@@ -1,12 +1,12 @@
 /* ===========================
-   SUPER RIJODA - PLAYER (CORRIGÉ)
+   SUPER RIJODA - PLAYER 
    =========================== */
 
 class Player extends Entity {
   constructor(x, y) {
-    super(x, y, 64, 64); // Hitbox du joueur
+    super(x, y, 64, 64); // Base hitbox size
 
-    // Spritesheets : course + attaque
+    // Spritesheets : run and attack
     this.sheetRun = new Sheet(
       ASSETS.playerRun,
       PLAYER_SHEET_RUN || SHEETS.playerRun
@@ -30,25 +30,25 @@ class Player extends Entity {
         : "none";
     this.scaledOnce = false;
 
-    // État de jeu
+    // State of movement
     this.jump = -12;
     this.invul = 0;
     this.onGround = false;
 
-    // Direction et Attaque
-    this.facing = 1; // 1 = droite, -1 = gauche
+    // Direction & attack state
+    this.facing = 1; // 1 = right, -1 = left
     this.isAttacking = false;
     this.attackTimer = 0;
-    this.attackDuration = 0.25; // Durée de l'animation d'attaque
-    this.attackCooldown = 0; // Délai entre deux attaques
-    this.shurikenCooldown = 0; // Délai entre deux shurikens
+    this.attackDuration = 0.25; // Duration of the attack animation
+    this.attackCooldown = 0; // Delay between two attacks
+    this.shurikenCooldown = 0; // Delay between two shurikens
   }
 
   update(dt, L) {
     const prevX = this.x;
     const prevY = this.y;
 
-    // ---- 1. INPUTS (MOUVEMENT) ----
+    // ---- 1. INPUTS ----
     const left = keys.has("ArrowLeft") || keys.has("KeyA");
     const right = keys.has("ArrowRight") || keys.has("KeyD");
     const moving = left || right;
@@ -64,15 +64,15 @@ class Player extends Entity {
       if (!moving && Math.abs(this.dx) < 0.05) this.dx = 0;
     }
 
-    // Saut
+    // JUMP WITH SPACE
     if (keys.has("Space") && this.onGround) {
       this.dy = this.jump;
       this.onGround = false;
       playSFX(ASSETS.sfx_jump);
     }
 
-    // ---- 2. INPUTS (ATTAQUE) - RETABLIS ----
-    // Gestion des timers
+    // ---- 2. COMBAT ----
+    // Gestion of attack timer
     if (this.attackTimer > 0) {
       this.attackTimer -= dt;
       if (this.attackTimer <= 0) this.isAttacking = false;
@@ -81,60 +81,58 @@ class Player extends Entity {
       this.attackCooldown -= dt;
     }
 
-    // Gestion du cooldown
+    // Gestion of shuriken cooldown
     if (this.shurikenCooldown > 0) this.shurikenCooldown -= dt;
 
-    // TIRE AVEC LA TOUCHE 'F'
+    // Shooting shuriken with 'F'
     if (keys.has("KeyF") && this.shurikenCooldown <= 0) {
-      this.shurikenCooldown = 0.5; // Délai de 0.5 seconde entre chaque tir
+      this.shurikenCooldown = 0.5; // Delay between two shurikens
 
-      // Créer le shuriken devant le joueur
+      // Create the shuriken
       const spawnX = this.facing === 1 ? this.x + this.w : this.x - 24;
       const s = new Shuriken(spawnX, this.y + 20, this.facing);
 
-      // Ajouter le shuriken au niveau
+      // Add to level projectiles
       L.projectiles.push(s);
 
       playSFX(ASSETS.sfx_throw);
     }
 
-    // Déclenchement avec 'R'
+    // Start attack with 'R'
     if (keys.has("KeyR") && !this.isAttacking && this.attackCooldown <= 0) {
       this.isAttacking = true;
       this.attackTimer = this.attackDuration;
-      this.attackCooldown = 0.4; // Petit délai avant de pouvoir ré-attaquer
+      this.attackCooldown = 0.4; // Short delay before next attack
       this.sheet = this.sheetAttack;
       this.sheet.set("attack");
       playSFX(ASSETS.sfx_attack);
     }
 
-    // ---- 3. PHYSIQUE ----
+    // ---- 3. PHYSICS ----
     this.dy += Game.gravity;
     this.x += this.dx;
     this.y += this.dy;
 
-    // ---- 4. COLLISIONS PLATEFORMES (NOUVELLE LOGIQUE) ----
+    // ---- 4. COLLISIONS ----
     this.onGround = false;
 
-    // On combine plateformes fixes et mobiles
+    // Combine static and moving platforms
     const allPlatforms = [...L.platforms, ...(L.movingPlatforms || [])];
 
     for (const p of allPlatforms) {
-      // Vérif basique collision rectangle
+      // Verify AABB collision
       const pRect = p.rect ? p.rect() : { x: p.x, y: p.y, w: p.w, h: p.h };
       if (!AABB(this.rect(), pRect)) continue;
 
       const prevBottom = prevY + this.h;
 
-      // ATTERRISSAGE (Valable pour toutes les plateformes)
-      // Si on tombe (dy >= 0) et qu'on était au-dessus avant
       if (this.dy >= 0 && prevBottom <= p.y + 12) {
-        // Marge de tolérance
+        // Tolerance of 12 pixels to land on slopes/platforms
         this.y = p.y - this.h;
         this.dy = 0;
         this.onGround = true;
 
-        // Si c'est une plateforme mobile, on bouge avec elle
+        // If standing on a moving platform, move with it
         if (p instanceof MovingPlatform) {
           this.x += p.dx;
           this.y += p.dy;
@@ -142,10 +140,10 @@ class Player extends Entity {
         continue;
       }
 
-      // Si c'est une plateforme traversable (bleue), on ignore les murs/plafond
+      // If one-way platform, ignore other collisions
       if (p.oneWay) continue;
 
-      // COLLISIONS SOLIDES (Murs et Plafond)
+      // Collisions from sides or top
       const prevTop = prevY;
       const currTop = this.y;
       const prevRight = prevX + this.w;
@@ -153,44 +151,44 @@ class Player extends Entity {
       const currRight = this.x + this.w;
       const currLeft = this.x;
 
-      // Tête dans le plafond
+      // Head in the ceiling
       if (prevTop >= p.y + p.h && currTop < p.y + p.h) {
         this.y = p.y + p.h;
         this.dy = 0.5;
         continue;
       }
-      // Mur Gauche
+      // Left Wall
       if (prevRight <= p.x && currRight > p.x) {
         this.x = p.x - this.w;
         this.dx = 0;
       }
-      // Mur Droit
+      // Right Wall
       else if (prevLeft >= p.x + p.w && currLeft < p.x + p.w) {
         this.x = p.x + p.w;
         this.dx = 0;
       }
     }
 
-    // ---- 5. LIMITES DU MONDE ----
+    // ---- 5. World limits ----
     this.x = clamp(this.x, 0, Game.worldW - this.w);
 
-    // Mort dans le vide
+    // Death if falling below the world
     if (this.y > Game.worldH) {
       Game.lives--;
       playSFX(ASSETS.sfx_damage);
       if (Game.lives > 0) {
         this.x = Level.respawnX;
         this.y = Level.respawnY - 20;
-        this.dy = 0; // Respawn en l'air
+        this.dy = 0; // Respawn in mid-air
         Game.resetHUD();
       } else {
         end(false);
       }
     }
 
-    // ---- 6. INTERACTION PIÈCES & ENNEMIS ----
+    // ---- 6. Interactions coins and enemies ----
 
-    // Pièces
+    // Coins
     for (const c of L.coins) {
       if (!c.taken && AABB(this.rect(), c.rect())) {
         c.taken = true;
@@ -200,21 +198,21 @@ class Player extends Entity {
       }
     }
 
-    // Ennemis (Collision corps à corps)
+    // Enemies
     for (const e of L.enemies) {
       if (e.dead) continue;
       if (AABB(this.rect(), e.rect())) {
-        // Si on saute sur la tête (Mario style)
+        // If coming from above, kill the enemy
         const fromTop = this.dy > 0 && this.y + this.h - e.y < 24;
 
         if (fromTop) {
           e.dead = true;
-          this.dy = this.jump * 0.6; // Rebond
+          this.dy = this.jump * 0.6; // Rebound
           playSFX(ASSETS.sfx_hit);
           Game.score += 50;
           Game.resetHUD();
         } else if (this.invul <= 0) {
-          // Sinon on prend des dégâts
+          // Else, take damage
           Game.lives--;
           this.invul = 60;
           Game.resetHUD();
@@ -224,17 +222,17 @@ class Player extends Entity {
       }
     }
 
-    // ---- 7. HITBOX D'ÉPÉE (QUAND ON ATTAQUE) - RETABLI ----
+    // ---- 7. SWORD HITBOX (WHEN ATTACKING) ----
     if (this.isAttacking) {
-      const swordW = 50; // Portée de l'épée
+      const swordW = 50; // Sword hitbox width
       const swordH = this.h * 0.6;
-      // La hitbox apparait devant le joueur
+      // The hitbox appears in front of the player
       const swordX = this.facing > 0 ? this.x + this.w : this.x - swordW;
       const swordY = this.y + this.h * 0.2;
 
       const swordRect = { x: swordX, y: swordY, w: swordW, h: swordH };
 
-      // Debug visuel de l'épée (décommenter pour voir le carré rouge)
+      // Debug visual of the sword (uncomment to see the red square)
       /*
       ctx.save(); ctx.fillStyle = "rgba(255,0,0,0.5)"; 
       ctx.fillRect(swordRect.x - Game.camX, swordRect.y, swordRect.w, swordRect.h); 
@@ -279,7 +277,7 @@ class Player extends Entity {
   }
 
   draw() {
-    // Affichage optimisé (Centré + Scale)
+    // Blinking effect when invulnerable
     if (this.invul > 0 && Math.floor(this.invul / 5) % 2 === 0) return;
 
     if (

@@ -2,17 +2,17 @@ class Enemy extends Entity {
   constructor(x, y) {
     super(x, y, 64, 64);
     this.sheet = new Sheet(ASSETS.enemy, SHEETS.enemy);
-    this.dir = Math.random() < 0.5 ? -1 : 1; // Commence vers la gauche ou droite
-    this.speed = 1.4; // Vitesse de marche
+    this.dir = Math.random() < 0.5 ? -1 : 1; // Starting direction
+    this.speed = 1.4; // Walking speed
     this.dead = false;
   }
 
   update(dt, L) {
     if (this.dead) return;
 
-    const lookAheadY = this.y + this.h + 5; // Un peu en dessous des pieds
+    const lookAheadY = this.y + this.h + 5; // Position just below the foot
 
-    // Retourne l'info de collision/sol pour une direction donnÃ©e
+    // Returns whether there's ground and/or wall in the given direction
     const probe = (dir) => {
       const lookAheadX = dir > 0 ? this.x + this.w + 5 : this.x - 5;
       let ground = false;
@@ -29,6 +29,7 @@ class Enemy extends Entity {
       }
 
       let wall = false;
+      // Check for wall in the next position
       const nextRect = { x: this.x + this.speed * dir, y: this.y, w: this.w, h: this.h };
       for (const p of L.platforms) {
         if (AABB(nextRect, p)) {
@@ -49,7 +50,7 @@ class Enemy extends Entity {
     const canBackward = backward.ground && !backward.wall;
     const isIdle = !canForward && !canBackward;
 
-    // Mouvement horizontal : reste immobile s'il n'a pas de place
+    // Horizontal Movement
     if (!isIdle) {
       if (!canForward && canBackward) {
         this.dir *= -1;
@@ -57,11 +58,11 @@ class Enemy extends Entity {
       this.x += this.speed * this.dir;
     }
 
-    // Physique Verticale (GravitÃ©) pour le spawn initial
+    // Vertical Physics (Gravity) for initial spawn
     this.dy += Game.gravity;
     this.y += this.dy;
 
-    // Collision au sol (pour ne pas traverser le sol au spawn)
+    // Ground collision (to avoid falling through the ground at spawn)
     for (const p of L.platforms) {
       if (AABB(this.rect(), p)) {
         if (this.dy > 0 && this.y + this.h - this.dy <= p.y) {
@@ -73,25 +74,24 @@ class Enemy extends Entity {
 
     // Animation
     this.sheet.set(isIdle ? "idle" : "walk");
-    // Si immobile (idle), on ne dÃ©file pas l'animation
+    // If immobile, no animation
     const animSpeed = isIdle ? 0 : 0.8;
     this.sheet.step(dt, animSpeed);
 
-    // Si je vais Ã  gauche, je retourne l'image
-    // (NÃ©cessite d'ajouter la logique de scale(-1,1) dans draw si voulu,
-    // mais pour l'instant Ã§a marche sans)
+    // If the enemy is moving left or right, flip the sprite accordingly
+    // Need to ensure the sprite sheet is facing the correct direction initially
+    // but for now it works without it
   }
 
   draw() {
     if (!this.dead) {
-      // Ajout du miroir pour l'ennemi aussi
+      // Add the mirroring logic here
       ctx.save();
       if (this.dir === 1) {
-        // Si l'image de base regarde Ã  gauche, inversez cette condition
-        // Normal
+        // If facing right, draw normally
         this.sheet.draw(this.x - Game.camX, this.y, this.w, this.h);
       } else {
-        // Miroir
+        // Mirror
         ctx.translate(this.x - Game.camX + this.w / 2, this.y);
         ctx.scale(-1, 1);
         this.sheet.draw(-this.w / 2, 0, this.w, this.h);

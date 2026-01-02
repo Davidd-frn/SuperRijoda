@@ -3,12 +3,12 @@ class MovingPlatform extends Entity {
     super(x, y, w, h);
     this.baseX = x;
     this.baseY = y;
-    this.rangeX = rangeX; // Distance de mouvement Horizontal
-    this.rangeY = rangeY; // Distance de mouvement Vertical
-    this.speed = speed; // Vitesse
+    this.rangeX = rangeX; // Distance of movement Horizontal
+    this.rangeY = rangeY; // Distance of movement Vertical
+    this.speed = speed; // Speed
     this.timer = 0;
 
-    // Pour que le joueur sache de combien on a bougé ce tour-ci
+    // For player movement
     this.dx = 0;
     this.dy = 0;
   }
@@ -19,11 +19,11 @@ class MovingPlatform extends Entity {
     const prevX = this.x;
     const prevY = this.y;
 
-    // Mouvement sinusoïdal (Aller-retour fluide)
+    // Sinusoidal movement (smooth back-and-forth)
     this.x = this.baseX + Math.sin(this.timer) * this.rangeX;
     this.y = this.baseY + Math.sin(this.timer) * this.rangeY;
 
-    // Calcul du déplacement réel pour déplacer le joueur avec nous
+    // Calculate actual displacement to move the player with us
     this.dx = this.x - prevX;
     this.dy = this.y - prevY;
   }
@@ -34,7 +34,7 @@ class MovingPlatform extends Entity {
     if (cloudPlatformImg.complete && cloudPlatformImg.naturalWidth) {
       ctx.drawImage(cloudPlatformImg, screenX, this.y, this.w, this.h);
     } else {
-      // fallback si l'image ne charge pas
+      // Fallback rectangle if image not loaded
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(screenX, this.y, this.w, this.h);
 

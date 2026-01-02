@@ -9,7 +9,7 @@ const ctx = canvas.getContext("2d");
 const CHARACTER_LIBRARY = {
   samurai: {
     id: "samurai",
-    name: "Ronin", // Vous pouvez changer le nom ici
+    name: "Ronin", 
     run: "/ressources/images/mockup/ronin.png",
     attack: "/ressources/images/mockup/ronin.png",
     filter: "none",
@@ -17,9 +17,9 @@ const CHARACTER_LIBRARY = {
     footAdjust: 14,
     matchDefaultSize: true, 
 
-    // Configuration pour les animations de course et saut 
+    // Configuration for running/jumping (Lines 1 and 2) 
     sheetRunSpec: {
-        cols: 4, rows: 3, // Le spritesheet a 4 colonnes et 3 lignes
+        cols: 4, rows: 3, // The sheet is 4 columns and 3 rows
         fw: null, fh: null, 
         seq: {
             idle: [0, 1, 2, 3],       
@@ -28,7 +28,7 @@ const CHARACTER_LIBRARY = {
         }
     },
 
-    // Configuration pour l'attaque (Ligne 3)
+    // Configuration for attacking (Line 3)
     sheetAttackSpec: {
         cols: 4, rows: 3,
         fw: null, fh: null,
@@ -49,21 +49,21 @@ const CHARACTER_LIBRARY = {
     sheetRunSpec: {
         cols: 4,
         rows: 3,
-        fw: null, fh: null, // Laisse le jeu calculer la taille des frames
+        fw: null, fh: null, // Let frame size auto-calc
         seq: {
-            idle: [0],               // Frame statique
+            idle: [0],               // Single idle frame
             run: [0, 1, 2, 3, 4, 5, 7], 
-            jump: [2]                // Une frame de saut arbitraire
+            jump: [2]                // One jump frame
         }
     },
 
-    // Configuration pour l'attaque (utilise la ligne 3)
+    // Configuration for attacking (Line 3)
     sheetAttackSpec: {
         cols: 4,
         rows: 3,
         fw: null, fh: null,
         seq: {
-            attack: [8, 9, 10, 11]   // La dernière ligne (indices 8,9,10,11)
+            attack: [8, 9, 10, 11]   // The last row for attack
         }
     },
   },
@@ -101,6 +101,7 @@ const CHARACTER_LIBRARY = {
 };
 
 const DEFAULT_CHARACTER_ID = "samurai";
+// Try to get selected character from localStorage, else default
 function getSelectedCharacterId() {
   try {
     const stored = localStorage.getItem("selectedCharacter");
@@ -111,13 +112,14 @@ function getSelectedCharacterId() {
   return DEFAULT_CHARACTER_ID;
 }
 
+// Selected character data
 const SELECTED_CHARACTER_ID = getSelectedCharacterId();
 const PLAYER_SKIN =
   CHARACTER_LIBRARY[SELECTED_CHARACTER_ID] ??
   CHARACTER_LIBRARY[DEFAULT_CHARACTER_ID];
 
 // Per-character player sheet specs (override defaults if provided)
-// ------- Assets (adapte les chemins à ton repo) -------
+// ------- Assets -------
 const ASSETS = {
   playerAttack: PLAYER_SKIN.attack,
   playerRun: PLAYER_SKIN.run,
@@ -125,7 +127,7 @@ const ASSETS = {
   bat: "/ressources/images/mockup/bat-enemy.png",
   coins: "/ressources/images/mockup/Coin-Mockup.png",
   shuriken: "ressources/images/mockup/shuriken.png",
-  // NOUVEAUX ASSETS AUDIO
+  // Audio 
   bgm: "/ressources/audio/level_theme.mp3",
   sfx_jump: "/ressources/audio/jump.wav",
   sfx_coin: "/ressources/audio/coin.wav",
@@ -135,22 +137,22 @@ const ASSETS = {
   sfx_attack: "/ressources/audio/slash.mp3",
 };
 
-// ------- Sprite sheets (ajuste si tes frames diffèrent) -------
+// ------- Sprite sheets -------
 const SHEETS = {
   playerRun: {
     cols: 4,
     rows: 3,
     scale: 0.12,
-    fw: 512, // Largeur basée sur 484 / 4
-    fh: 682, // Hauteur basée sur 336 / 3
+    fw: 512, // Width based on 512 / 4
+    fh: 682, // Height based on 682 / 3
     seq: { idle: [0], run: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], jump: [6] },
     footAdjust: 4,
   },
   playerAttack: {
     cols: 3,
-    rows: 3, // Si votre image playerAttack.jpg est la dernière fournie (4x3)
+    rows: 3, 
     scale: 0.55,
-    fw: 682, // Largeur augmentée pour l'épée
+    fw: 682, // Width increased for the sword
     fh: 682,
     seq: { attack: [0, 1, 2, 3, 4, 5, 6, 7] },
   },
@@ -221,6 +223,7 @@ addEventListener("visibilitychange", () => {
   if (document.hidden) keys.clear();
 });
 
+// Function to spawn explosion particles
 function spawnExplosion(x, y, color, count = 10) {
   for (let i = 0; i < count; i++) {
     Game.particles.push(new Particle(x, y, color, 5));
