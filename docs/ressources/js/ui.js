@@ -271,8 +271,8 @@ function togglePause(force) {
 // UI hooks
 document.getElementById("resumeBtn").onclick = () => togglePause(false);
 document.getElementById("retryBtn").onclick = () => {
-  location.href = "/SuperRijoda/play";
+  location.href = `${BASE_URL}#/play`;
 };
 document.getElementById("winMenuBtn").onclick = () => {
-  location.href = "/game";
+  location.href = `${BASE_URL}#/game`;
 };

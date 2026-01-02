@@ -588,7 +588,8 @@
       }
     } catch (e) {}
     localStorage.setItem(STORAGE_KEY, selected);
-    window.location.href = withBase("play");
+    // Use hash navigation so GitHub Pages doesn't need a server fallback.
+    window.location.href = `${BASE_URL}#/play`;
   });
 
 
