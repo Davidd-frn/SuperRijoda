@@ -1,0 +1,135 @@
+// Geo helper with multi-fallback: IP lookup -> geolocation -> reverse geocode
+(function () {
+  const COUNTRY_KEY = "playerCountryCode";
+
+  const countryCodeToFlag = (code) => {
+    if (!code || code.length !== 2) return "";
+    const offset = 127397;
+    return String.fromCodePoint(
+      ...code
+        .toUpperCase()
+        .split("")
+        .map((c) => c.charCodeAt(0) + offset)
+    );
+  };
+
+  async function fetchCountryCode() {
+    const endpoints = [
+      { url: "https://ipwho.is/?fields=country_code", field: "country_code" },
+      { url: "https://ipapi.co/country/", plain: true },
+      { url: "https://ifconfig.co/json", field: "country" },
+    ];
+
+    for (const ep of endpoints) {
+      try {
+        const res = await fetch(ep.url, { cache: "no-store" });
+        if (!res.ok) continue;
+        if (ep.plain) {
+          const txt = (await res.text()).trim();
+          if (txt.length === 2) return txt.toUpperCase();
+          continue;
+        }
+        const data = await res.json();
+        const code = (data?.[ep.field] || "").toString().trim();
+        if (code.length === 2) return code.toUpperCase();
+      } catch (e) {
+        continue;
+      }
+    }
+    return "";
+  }
+
+  const geolocateBrowser = () =>
+    new Promise((resolve, reject) => {
+      if (!navigator?.geolocation) {
+        reject(new Error("no geolocation API"));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve(pos.coords),
+        (err) => reject(err),
+        {
+          timeout: 5000,
+          maximumAge: 60000,
+        }
+      );
+    });
+
+  async function reverseCountryFromCoords(coords) {
+    if (!coords) return "";
+    const { latitude, longitude } = coords;
+    const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${encodeURIComponent(
+      latitude
+    )}&longitude=${encodeURIComponent(longitude)}&localityLanguage=en`;
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) return "";
+      const data = await res.json();
+      const code = (data?.countryCode || "").trim();
+      return code.length === 2 ? code.toUpperCase() : "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  async function initCountryFlag({ statusEl, flagEl, countryEl } = {}) {
+    if (statusEl) statusEl.textContent = "Detecting country...";
+
+    let code = "";
+    try {
+      code = (localStorage.getItem(COUNTRY_KEY) || "").toUpperCase();
+    } catch (e) {
+      code = "";
+    }
+
+    // Always attempt fresh fetch to reflect VPN/location changes.
+    let freshCode = await fetchCountryCode();
+
+    if (!freshCode) {
+      try {
+        const coords = await geolocateBrowser();
+        freshCode = await reverseCountryFromCoords(coords);
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    if (freshCode) {
+      code = freshCode;
+      try {
+        localStorage.setItem(COUNTRY_KEY, code);
+      } catch (e) {}
+    }
+
+    const flagEmoji = countryCodeToFlag(code);
+    const flagUrl = code
+      ? `https://flagcdn.com/24x18/${code.toLowerCase()}.png`
+      : "";
+
+    if (flagEl) {
+      if (flagUrl) {
+        flagEl.src = flagUrl;
+        flagEl.alt = code;
+        flagEl.hidden = false;
+      } else {
+        flagEl.hidden = true;
+      }
+    }
+    if (countryEl) {
+      countryEl.textContent = `Country: ${flagEmoji || "--"}`;
+    }
+    if (statusEl)
+      statusEl.textContent = code
+        ? `Detected: ${code}`
+        : "Country unavailable (allow geolocation or pick manually)";
+
+    return code;
+  }
+
+  window.Geo = {
+    initCountryFlag,
+    countryCodeToFlag,
+    COUNTRY_KEY,
+  };
+})();
+
