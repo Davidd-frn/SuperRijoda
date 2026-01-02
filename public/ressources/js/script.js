@@ -57,14 +57,14 @@
   let firebaseApi = null;
   const getFirestoreApi = async () => {
     if (firebaseApi) return firebaseApi;
-    const [{ initializeApp }, firestore, authModule] = await Promise.all([
+    const [{ initializeApp, getApps }, firestore, authModule] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"),
       import(
         "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"
       ),
       import("https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"),
     ]);
-    const app = initializeApp(FIREBASE_CONFIG);
+    const app = getApps().length ? getApps()[0] : initializeApp(FIREBASE_CONFIG);
     const { getFirestore, collection, getDocs, query, orderBy, limit } =
       firestore;
     const { getAuth, signInAnonymously } = authModule;
