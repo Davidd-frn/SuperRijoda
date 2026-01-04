@@ -562,6 +562,7 @@
     } catch (e) {}
     localStorage.setItem(STORAGE_KEY, selected);
     window.location.href = withBase("#/play");
+    window.location.reload();
   });
 
   // Event listeners for buttons and forms.

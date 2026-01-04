@@ -6,8 +6,8 @@
 const bgImages = [];
 // List of background image files for different levels
 const bgFiles = [
-  "ressources/images/background/BG-Lvl1.png", 
-  "ressources/images/background/BG-Lvl2.png", 
+  "ressources/images/background/BG-Lvl1.png",
+  "ressources/images/background/BG-Lvl2.png",
   "ressources/images/background/BG-Lvl3.png",
 ];
 
@@ -117,7 +117,6 @@ function loop(t) {
   // We loop
   requestAnimationFrame(loop);
 }
-
 
 // --- START GAME ---
 function startGame() {
